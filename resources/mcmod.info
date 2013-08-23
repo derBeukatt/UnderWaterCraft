@@ -1,0 +1,19 @@
+[
+{
+  "modid" : "UnderWaterCraft",
+  "name" : "UnderWaterCraft",
+  "version": "${project.version}",
+  "mcversion": "${minecraft.version}",
+  "credits" : "Thanks for Vswe for his tutorials",
+  "authors": [
+    "derBeukatt"
+  ],
+  "description": "A forge mod to enrich minecraft underwater experience.",
+  "url" : "",
+  "updateUrl" : "",
+  "logoFile" : "",
+  "parent" : "",
+  "screenshots": [
+  ]
+}
+]
