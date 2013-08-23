@@ -9,13 +9,6 @@ import org.derbeukatt.underwatercraft.gui.UnderWaterCraftTab;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-/**
- * Created with IntelliJ IDEA.
- * User: philipp
- * Date: 05.08.13s
- * Time: 19:37
- * To change this template use File | Settings | File Templates.
- */
 public class ItemScaleHard extends Item {
 
     public ItemScaleHard(int id)

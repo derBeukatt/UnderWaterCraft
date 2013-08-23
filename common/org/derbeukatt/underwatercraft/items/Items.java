@@ -7,13 +7,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
-/**
- * Created with IntelliJ IDEA.
- * User: philipp
- * Date: 05.08.13
- * Time: 19:36
- * To change this template use File | Settings | File Templates.
- */
 public class Items {
 
     public static Item itemScale;

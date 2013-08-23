@@ -54,7 +54,7 @@ public class UnderWaterCraft{
     }
 
     @EventHandler
-    public void modLoaded(FMLPostInitializationEvent event)
+    public void modsLoaded(FMLPostInitializationEvent event)
     {
     }
 }

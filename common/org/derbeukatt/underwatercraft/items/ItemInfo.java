@@ -1,12 +1,5 @@
 package org.derbeukatt.underwatercraft.items;
 
-/**
- * Created with IntelliJ IDEA.
- * User: philipp
- * Date: 05.08.13
- * Time: 19:58
- * To change this template use File | Settings | File Templates.
- */
 public class ItemInfo {
 
     public static final String TEXTURE_LOCATION = "underwatercraft";

@@ -9,13 +9,6 @@ import org.derbeukatt.underwatercraft.gui.UnderWaterCraftTab;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-/**
- * Created with IntelliJ IDEA.
- * User: philipp
- * Date: 08.08.13
- * Time: 17:40
- * To change this template use File | Settings | File Templates.
- */
 public class ItemWhetstone extends Item {
 
     public ItemWhetstone(int id) {

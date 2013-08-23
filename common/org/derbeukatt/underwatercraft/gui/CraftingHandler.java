@@ -8,13 +8,6 @@ import org.derbeukatt.underwatercraft.items.Items;
 
 import cpw.mods.fml.common.ICraftingHandler;
 
-/**
- * Created with IntelliJ IDEA.
- * User: philipp
- * Date: 08.08.13
- * Time: 18:59
- * To change this template use File | Settings | File Templates.
- */
 public class CraftingHandler implements ICraftingHandler {
     @Override
     public void onCrafting(EntityPlayer player, ItemStack item, IInventory craftMatrix) {
@@ -48,6 +41,6 @@ public class CraftingHandler implements ICraftingHandler {
 
     @Override
     public void onSmelting(EntityPlayer player, ItemStack item) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        
     }
 }

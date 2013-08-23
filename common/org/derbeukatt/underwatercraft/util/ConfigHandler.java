@@ -5,13 +5,6 @@ import org.derbeukatt.underwatercraft.items.ItemInfo;
 
 import java.io.File;
 
-/**
- * Created with IntelliJ IDEA.
- * User: philipp
- * Date: 05.08.13
- * Time: 19:54
- * To change this template use File | Settings | File Templates.
- */
 public class ConfigHandler {
 
     private static Configuration configuration;
