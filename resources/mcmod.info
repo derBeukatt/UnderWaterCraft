@@ -2,8 +2,8 @@
 {
   "modid" : "UnderWaterCraft",
   "name" : "UnderWaterCraft",
-  "version": "0.0.1",
-  "mcversion": "1.6.2",
+  "version": "@VERSION@",
+  "mcversion": "@MCVERSION@",
   "credits" : "Thanks for Vswe for his tutorials",
   "authors": [
     "derBeukatt"
