@@ -49,18 +49,18 @@
 	</target>
 	
 	<target name="genkey">
-		<genkey alias="${build.keystore.alias}" verbose="true" storepass="${build.keystore.password}" keystore="${build.keystore.location}">
+		<genkey alias="${build.keystore.alias}" verbose="true" storepass="${build.keystore.password}" keystore="${build.keystore.location}" keyalg="DSA" sigalg="SHA1withDSA">
 			<dname>
                  		<param name="CN" value="${build.keystore.param.cn}"/>
                 		<param name="OU" value="${build.keystore.param.ou}"/>
-          			<param name="O"  value="${build.keystore.param.o}"/>
+          				<param name="O"  value="${build.keystore.param.o}"/>
                 		<param name="C"  value="${build.keystore.param.c}"/>		
-	               </dname>
+	        </dname>
 		</genkey>
 	</target>
 
 	<target name="sign_jar">
-		<signjar jar="${build.dir.release}\${build.release.minecraft.version}\${build.release.mod.version}\uwc-universal-${build.release.mod.version}-${build_number.build_number}.jar" keystore="${build.keystore.location}" alias="${build.keystore.alias}" storepass="${build.keystore.password}" />
+		<signjar jar="${build.dir.release}\${build.release.minecraft.version}\${build.release.mod.version}\uwc-universal-${build.release.mod.version}-${build_number.build_number}.jar" keystore="${build.keystore.location}" alias="${build.keystore.alias}" storepass="${build.keystore.password}" sigalg="SHA1withDSA" digestalg="SHA1"/>
 	</target>
 	
 	<target name="build">
