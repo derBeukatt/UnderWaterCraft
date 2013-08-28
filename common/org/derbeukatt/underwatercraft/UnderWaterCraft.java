@@ -3,6 +3,7 @@ package org.derbeukatt.underwatercraft;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.derbeukatt.underwatercraft.blocks.Blocks;
 import org.derbeukatt.underwatercraft.gui.CraftingHandler;
 import org.derbeukatt.underwatercraft.items.Items;
 import org.derbeukatt.underwatercraft.network.PacketHandler;
@@ -43,7 +44,9 @@ public class UnderWaterCraft{
     {
         ConfigHandler.init(event.getSuggestedConfigurationFile());
         Items.init();
+        Blocks.init();
         GameRegistry.registerCraftingHandler(new CraftingHandler());
+        proxy.initRenderers();
     }
 
     @EventHandler
@@ -51,6 +54,7 @@ public class UnderWaterCraft{
     {
         Items.addNames();
         Items.registerRecipes();
+        Blocks.addNames();
     }
 
     @EventHandler
