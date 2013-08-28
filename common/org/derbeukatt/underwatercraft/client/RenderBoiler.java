@@ -21,15 +21,29 @@ public class RenderBoiler implements ISimpleBlockRenderingHandler
 	
 	@Override
 	public void renderInventoryBlock(Block block, int metadata, int modelID, RenderBlocks renderer) {
-		renderer.setRenderBounds(0.0F, 0.75F, 0.0F, 1.0F, 1.0F, 1.0F);
+		
+		/* bottom */
+		renderer.setRenderBounds(0.0F, 0.2F, 0.0F, 1.0F, 0.4F, 1.0F);
+		renderStandardInvBlock(renderer, block, metadata);
+        
+        /* legs */
+        renderer.setRenderBounds(0F, 0F, 0F, 0.25F, 0.2F, 0.25F);
         renderStandardInvBlock(renderer, block, metadata);
-        renderer.setRenderBounds(0.0F, 0.0F, 0.0F, 0.25F, 0.75F, 0.25F);
+        renderer.setRenderBounds(0.75F, 0F, 0F, 1F, 0.2F, 0.25F);
         renderStandardInvBlock(renderer, block, metadata);
-        renderer.setRenderBounds(0.75F, 0.0F, 0.0F, 1.0F, 0.75F, 0.25F);
+        renderer.setRenderBounds(0F, 0F, 0.75F, 0.25F, 0.2F, 1F);
         renderStandardInvBlock(renderer, block, metadata);
-        renderer.setRenderBounds(0.0F, 0.0F, 0.75F, 0.25F, 0.75F, 1.0F);
+        renderer.setRenderBounds(0.75F, 0F, 0.75F, 1F, 0.2F, 1F);
         renderStandardInvBlock(renderer, block, metadata);
-        renderer.setRenderBounds(0.75F, 0.0F, 0.75F, 1.0F, 0.75F, 1.0F);
+        
+        /* sides */
+        renderer.setRenderBounds(0F, 0.4F, 0F, 1F, 1F, 0.2F);
+        renderStandardInvBlock(renderer, block, metadata);
+        renderer.setRenderBounds(0F, 0.4F, 0.2F, 0.2F, 1F, 0.8F);
+        renderStandardInvBlock(renderer, block, metadata);
+        renderer.setRenderBounds(0.8F, 0.4F, 0.2F, 1F, 1F, 0.8F);
+        renderStandardInvBlock(renderer, block, metadata);
+        renderer.setRenderBounds(0F, 0.4F, 0.8F, 1F, 1F, 1F);
         renderStandardInvBlock(renderer, block, metadata);
 	}
 
@@ -38,15 +52,28 @@ public class RenderBoiler implements ISimpleBlockRenderingHandler
 		
 		Tessellator.instance.setColorOpaque_F(1F, 1F, 1F);
 		
-		renderer.setRenderBounds(0.0F, 0.75F, 0.0F, 1.0F, 1.0F, 1.0F);
+		/* bottom */
+		renderer.setRenderBounds(0.0F, 0.2F, 0.0F, 1.0F, 0.4F, 1.0F);
+		renderer.renderStandardBlock(block, x, y, z);
+        
+        /* legs */
+        renderer.setRenderBounds(0F, 0F, 0F, 0.25F, 0.2F, 0.25F);
         renderer.renderStandardBlock(block, x, y, z);
-        renderer.setRenderBounds(0.0F, 0.0F, 0.0F, 0.25F, 0.75F, 0.25F);
+        renderer.setRenderBounds(0.75F, 0F, 0F, 1F, 0.2F, 0.25F);
         renderer.renderStandardBlock(block, x, y, z);
-        renderer.setRenderBounds(0.75F, 0.0F, 0.0F, 1.0F, 0.75F, 0.25F);
+        renderer.setRenderBounds(0F, 0F, 0.75F, 0.25F, 0.2F, 1F);
         renderer.renderStandardBlock(block, x, y, z);
-        renderer.setRenderBounds(0.0F, 0.0F, 0.75F, 0.25F, 0.75F, 1.0F);
+        renderer.setRenderBounds(0.75F, 0F, 0.75F, 1F, 0.2F, 1F);
         renderer.renderStandardBlock(block, x, y, z);
-        renderer.setRenderBounds(0.75F, 0.0F, 0.75F, 1.0F, 0.75F, 1.0F);
+        
+        /* sides */
+        renderer.setRenderBounds(0F, 0.4F, 0F, 1F, 1F, 0.2F);
+        renderer.renderStandardBlock(block, x, y, z);
+        renderer.setRenderBounds(0F, 0.4F, 0.2F, 0.2F, 1F, 0.8F);
+        renderer.renderStandardBlock(block, x, y, z);
+        renderer.setRenderBounds(0.8F, 0.4F, 0.2F, 1F, 1F, 0.8F);
+        renderer.renderStandardBlock(block, x, y, z);
+        renderer.setRenderBounds(0F, 0.4F, 0.8F, 1F, 1F, 1F);
         renderer.renderStandardBlock(block, x, y, z);
 		
 		return true;
