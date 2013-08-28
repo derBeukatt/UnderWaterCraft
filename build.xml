@@ -51,10 +51,10 @@
 	<target name="genkey">
 		<genkey alias="${build.keystore.alias}" verbose="true" storepass="${build.keystore.password}" keystore="${build.keystore.location}" keyalg="DSA" sigalg="SHA1withDSA">
 			<dname>
-                 		<param name="CN" value="${build.keystore.param.cn}"/>
-                		<param name="OU" value="${build.keystore.param.ou}"/>
-          				<param name="O"  value="${build.keystore.param.o}"/>
-                		<param name="C"  value="${build.keystore.param.c}"/>		
+                <param name="CN" value="${build.keystore.param.cn}"/>
+                <param name="OU" value="${build.keystore.param.ou}"/>
+          		<param name="O"  value="${build.keystore.param.o}"/>
+                <param name="C"  value="${build.keystore.param.c}"/>		
 	        </dname>
 		</genkey>
 	</target>
