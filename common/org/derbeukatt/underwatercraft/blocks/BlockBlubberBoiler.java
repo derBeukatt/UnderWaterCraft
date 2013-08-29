@@ -15,7 +15,7 @@ import net.minecraftforge.fluids.FluidStack;
 
 import org.derbeukatt.underwatercraft.gui.UnderWaterCraftTab;
 
-public class BlockBlubberBoiler extends Block{
+public class BlockBlubberBoiler extends Block {
 
 	protected BlockBlubberBoiler(int id, Material material) 
 	{
