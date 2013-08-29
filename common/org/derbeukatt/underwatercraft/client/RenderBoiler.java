@@ -1,8 +1,10 @@
 package org.derbeukatt.underwatercraft.client;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockFluid;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.Icon;
 import net.minecraft.world.IBlockAccess;
 
 import org.lwjgl.opengl.GL11;
@@ -76,6 +78,20 @@ public class RenderBoiler implements ISimpleBlockRenderingHandler
         renderer.setRenderBounds(0F, 0.4F, 0.8F, 1F, 1F, 1F);
         renderer.renderStandardBlock(block, x, y, z);
 		
+        int meta = world.getBlockMetadata(x, y, z);
+        
+        if (meta > 0)
+        {
+            Icon waterIcon = BlockFluid.func_94424_b("water_still");
+
+            if (meta > 3)
+            {
+                meta = 3;
+            }
+            renderer.setRenderBounds(0.2f, 0.4f, 0.2f, 0.8f, 0.8f, 0.8f);
+            renderer.renderFaceYPos(block, 0D, 0D, 0D, waterIcon);
+        }
+        
 		return true;
 	}
 
@@ -118,6 +134,11 @@ public class RenderBoiler implements ISimpleBlockRenderingHandler
         renderblocks.renderFaceXPos(block, 0.0D, 0.0D, 0.0D, block.getIcon(5, meta));
         tessellator.draw();
         GL11.glTranslatef(0.5F, 0.5F, 0.5F);
+        
+        if(meta == 3)
+        {
+        	
+        }
     }
 
 }
