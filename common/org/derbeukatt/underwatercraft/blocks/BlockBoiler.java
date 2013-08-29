@@ -10,6 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
@@ -104,6 +105,12 @@ public class BlockBoiler extends Block {
 	public void getSubBlocks(int id, CreativeTabs tab, List list) {
 		list.add(new ItemStack(id, 1, 0));
 		list.add(new ItemStack(id, 1, 1));
+	}
+	
+	@Override
+	public boolean shouldSideBeRendered(IBlockAccess par1iBlockAccess, int par2, int par3, int par4, int par5) {
+
+		return true;
 	}
 	
 	@Override
