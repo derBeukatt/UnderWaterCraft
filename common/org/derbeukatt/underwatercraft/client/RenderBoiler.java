@@ -18,7 +18,6 @@ public class RenderBoiler implements ISimpleBlockRenderingHandler
 		id = RenderingRegistry.getNextAvailableRenderId();
 	}
 	
-	
 	@Override
 	public void renderInventoryBlock(Block block, int metadata, int modelID, RenderBlocks renderer) {
 		
@@ -85,7 +84,7 @@ public class RenderBoiler implements ISimpleBlockRenderingHandler
         renderer.renderStandardBlock(block, x, y, z);
         renderer.setRenderBounds(0F, 0.4F, 0.9F, 1F, 1F, 1F);
         renderer.renderStandardBlock(block, x, y, z);
-		
+        
         int meta = world.getBlockMetadata(x, y, z);
         
         if (meta > 0)

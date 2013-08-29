@@ -11,7 +11,7 @@ public class Blocks {
 	
 	public static void init()
 	{
-		boiler = new BlockBlubberBoiler(BlockInfo.BOILER_ID, Material.rock);
+		boiler = new BlockBoiler(BlockInfo.BOILER_ID, Material.rock);
 		GameRegistry.registerBlock(boiler, BlockInfo.BOILER_KEY);
 	}
 	

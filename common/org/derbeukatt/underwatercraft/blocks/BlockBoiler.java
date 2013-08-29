@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -15,9 +16,12 @@ import net.minecraftforge.fluids.FluidStack;
 
 import org.derbeukatt.underwatercraft.gui.UnderWaterCraftTab;
 
-public class BlockBlubberBoiler extends Block {
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
-	protected BlockBlubberBoiler(int id, Material material) 
+public class BlockBoiler extends Block {
+
+	protected BlockBoiler(int id, Material material) 
 	{
 		super(id, material);
 		setCreativeTab(UnderWaterCraftTab.tabUnderWaterCraft);
@@ -28,70 +32,91 @@ public class BlockBlubberBoiler extends Block {
 	
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
-		ItemStack heldItem = player.inventory.getCurrentItem();
-        if (heldItem != null)
-        {
-            FluidStack fluid = FluidContainerRegistry.getFluidForFilledItem(player.getCurrentEquippedItem());
-            
-            if (fluid != null)
-            {
-            	if(world.getBlockMetadata(x, y, z) == 0)
-            	{
-		        	if (!player.capabilities.isCreativeMode)
-		        	{
-		        		player.inventory.setInventorySlotContents(player.inventory.currentItem, consumeItem(heldItem));
-		        		world.setBlockMetadataWithNotify(x, y, z, 1, 2);
-		                return true;
-		            }
-		            else
-		            {
-		            	world.setBlockMetadataWithNotify(x, y, z, 1, 2);
-		                return true;
-		            }
-            	}
-            	else
-            	{
-            		return true;
-            	}
-            }
-            else if (FluidContainerRegistry.isBucket(heldItem))
-            {
-            	if(world.getBlockMetadata(x, y, z) > 0)
-            	{
-	            	
-	                ItemStack fillStack = new ItemStack(Item.bucketWater);
-	                
-	                if (!player.capabilities.isCreativeMode)
-	                {
-	                    if (heldItem.stackSize == 1)
-	                    {
-	                        player.inventory.setInventorySlotContents(player.inventory.currentItem, fillStack);
-	                    }
-	                    else
-	                    {
-	                        player.inventory.setInventorySlotContents(player.inventory.currentItem, consumeItem(heldItem));
-	
-	                        if (!player.inventory.addItemStackToInventory(fillStack))
-	                        {
-	                            player.dropPlayerItem(fillStack);
-	                        }
-	                    }
-	                }
-                
-	                world.setBlockMetadataWithNotify(x, y, z, 0, 2);
-                
-	                return true;
-            	}
-            	else
-            	{
-            		return true;
-            	}
-            }
-        }
+		if(!world.isRemote)
+		{
+			ItemStack heldItem = player.inventory.getCurrentItem();
+			if (heldItem != null)
+	        {
+	            FluidStack fluid = FluidContainerRegistry.getFluidForFilledItem(player.getCurrentEquippedItem());
+	            
+	            if (fluid != null)
+	            {
+	            	if(world.getBlockMetadata(x, y, z) == 0)
+	            	{
+			        	if (!player.capabilities.isCreativeMode)
+			        	{
+			        		player.inventory.setInventorySlotContents(player.inventory.currentItem, consumeItem(heldItem));
 
-        return false;
+			        	}
+			            world.setBlockMetadataWithNotify(x, y, z, 1, 2);
+			            
+	            	}
+	            }
+	            else if (FluidContainerRegistry.isBucket(heldItem))
+	            {
+	            	if(world.getBlockMetadata(x, y, z) > 0)
+	            	{
+		                ItemStack fillStack = new ItemStack(Item.bucketWater);
+		                
+		                if (!player.capabilities.isCreativeMode)
+		                {
+		                    if (heldItem.stackSize == 1)
+		                    {
+		                        player.inventory.setInventorySlotContents(player.inventory.currentItem, fillStack);
+		                    }
+		                    else
+		                    {
+		                        player.inventory.setInventorySlotContents(player.inventory.currentItem, consumeItem(heldItem));
+		
+		                        if (!player.inventory.addItemStackToInventory(fillStack))
+		                        {
+		                            player.dropPlayerItem(fillStack);
+		                        }
+		                    }
+		                }
+	                
+		                world.setBlockMetadataWithNotify(x, y, z, 0, 2);
+	            	}
+	            }
+	            else
+	            {
+	            	System.out.println("Opening GUI!!!");
+	            }
+	            
+	            return true;
+	        }
+	        else
+	        {
+	        	System.out.println("Opening GUI!!!");
+	        	        	
+	        	return true;
+	        }
+		}
+		else
+		{
+			return true;
+		}
+	}
+		
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void getSubBlocks(int id, CreativeTabs tab, List list) {
+		list.add(new ItemStack(id, 1, 0));
+		list.add(new ItemStack(id, 1, 1));
 	}
 	
+	@Override
+	public void breakBlock(World par1World, int par2, int par3, int par4,
+			int par5, int par6) {
+		// TODO Auto-generated method stub
+		super.breakBlock(par1World, par2, par3, par4, par5, par6);
+	}
+	
+	@Override
+	public int damageDropped(int meta) {
+		return meta;
+	}
 	
 	@SuppressWarnings("rawtypes")
 	@Override
