@@ -92,7 +92,7 @@ public class RenderBoiler implements ISimpleBlockRenderingHandler {
 		if (metadata > 0) {
 			final Icon icon = BlockFluid.func_94424_b("water_still");
 
-			renderer.setRenderBounds(0.1F, 0.4F, 0.1F, 0.9F, 0.9F, 0.9F);
+			renderer.setRenderBounds(0.0625F, 0.4F, 0.0625F, 0.9375F, 0.9F, 0.9375F);
 
 			final Tessellator tessellator = Tessellator.instance;
 
@@ -143,7 +143,7 @@ public class RenderBoiler implements ISimpleBlockRenderingHandler {
 		if (meta > 0) {
 			final Icon icon = BlockFluid.func_94424_b("water_still");
 
-			renderer.setRenderBounds(0.1F, 0.4F, 0.1F, 0.9F, 0.9F, 0.9F);
+			renderer.setRenderBounds(0.0625F, 0.4F, 0.0625F, 0.9375F, 0.9F, 0.9375F);
 			renderer.renderFaceYPos(block, x, y, z, icon);
 		}
 
