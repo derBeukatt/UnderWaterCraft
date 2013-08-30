@@ -1,6 +1,7 @@
 package org.derbeukatt.underwatercraft.blocks;
 
 import java.util.List;
+import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -8,9 +9,11 @@ import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.Icon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
@@ -18,12 +21,15 @@ import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
+import org.derbeukatt.underwatercraft.client.particle.Particles;
 import org.derbeukatt.underwatercraft.gui.UnderWaterCraftTab;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockBoiler extends Block {
+
+	private static final int NR_OF_PARTICLES = 2;
 
 	public static ItemStack consumeItem(final ItemStack stack) {
 		if (stack.stackSize == 1) {
@@ -41,6 +47,9 @@ public class BlockBoiler extends Block {
 
 	@SideOnly(Side.CLIENT)
 	private Icon botIcon;
+	@SideOnly(Side.CLIENT)
+	public Icon particleIcon;
+
 	@SideOnly(Side.CLIENT)
 	private Icon sideIcon;
 
@@ -116,6 +125,7 @@ public class BlockBoiler extends Block {
 			final List list) {
 		list.add(new ItemStack(id, 1, 0));
 		list.add(new ItemStack(id, 1, 1));
+		list.add(new ItemStack(id, 1, 2));
 	}
 
 	@Override
@@ -169,6 +179,8 @@ public class BlockBoiler extends Block {
 
 						world.setBlockMetadataWithNotify(x, y, z, 0, 3);
 					}
+				} else if (heldItem.itemID == Item.fishRaw.itemID) {
+					world.setBlockMetadataWithNotify(x, y, z, 2, 3);
 				} else {
 					System.out.println("Opening GUI!!!");
 				}
@@ -184,6 +196,38 @@ public class BlockBoiler extends Block {
 		}
 	}
 
+	@Override
+	public void onEntityCollidedWithBlock(final World world, final int x,
+			final int y, final int z, final Entity entity) {
+
+		if (world.getBlockMetadata(x, y, z) == 2) {
+			if (entity instanceof EntityPlayerMP) {
+				System.out.println("Collision");
+				entity.attackEntityFrom(DamageSource.inFire, 1F);
+			}
+		}
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void randomDisplayTick(final World world, final int x, final int y,
+			final int z, final Random rand) {
+
+		if (world.getBlockMetadata(x, y, z) == 2) {
+			final float particleX = x
+					+ ((rand.nextFloat() * (0.75F - 0.25F)) + 0.25F);
+			final float particleY = y
+					+ ((rand.nextFloat() * (0.925F - 0.9F)) + 0.9F);
+			final float particleZ = z
+					+ ((rand.nextFloat() * (0.75F - 0.25F)) + 0.25F);
+
+			for (int i = 0; i < NR_OF_PARTICLES; i++) {
+				Particles.BOILERBUBBLES.spawnParticle(world, particleX,
+						particleY, particleZ, 0.0D, 0.0D, 0.0D);
+			}
+		}
+	}
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerIcons(final IconRegister register) {
@@ -194,6 +238,9 @@ public class BlockBoiler extends Block {
 						BlockInfo.BOILER_BOTTOM).toString());
 		this.sideIcon = register.registerIcon(new ResourceLocation(
 				BlockInfo.TEXTURE_LOCATION, BlockInfo.BOILER_SIDE).toString());
+		this.particleIcon = register.registerIcon(new ResourceLocation(
+				BlockInfo.TEXTURE_LOCATION, BlockInfo.BOILER_PARTICLE)
+				.toString());
 	}
 
 	@Override
@@ -211,5 +258,4 @@ public class BlockBoiler extends Block {
 			final int par2, final int par3, final int par4, final int par5) {
 		return true;
 	}
-
 }
