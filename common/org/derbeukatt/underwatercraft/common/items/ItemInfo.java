@@ -1,4 +1,4 @@
-package org.derbeukatt.underwatercraft.items;
+package org.derbeukatt.underwatercraft.common.items;
 
 public class ItemInfo {
 

@@ -1,4 +1,4 @@
-package org.derbeukatt.underwatercraft.proxies;
+package org.derbeukatt.underwatercraft.common;
 
 public class CommonProxy {
 	

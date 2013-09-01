@@ -1,9 +1,10 @@
-package org.derbeukatt.underwatercraft.blocks;
+package org.derbeukatt.underwatercraft.common.blocks;
 
 import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -12,6 +13,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Icon;
@@ -21,13 +23,16 @@ import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
-import org.derbeukatt.underwatercraft.client.particle.Particles;
-import org.derbeukatt.underwatercraft.gui.UnderWaterCraftTab;
+import org.derbeukatt.underwatercraft.UnderWaterCraft;
+import org.derbeukatt.underwatercraft.client.fx.Particles;
+import org.derbeukatt.underwatercraft.client.gui.UnderWaterCraftTab;
+import org.derbeukatt.underwatercraft.common.tileentity.TileEntityBoiler;
 
+import cpw.mods.fml.common.network.FMLNetworkHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class BlockBoiler extends Block {
+public class BlockBoiler extends BlockContainer {
 
 	private static final int NR_OF_PARTICLES = 2;
 
@@ -95,6 +100,11 @@ public class BlockBoiler extends Block {
 		super.addCollisionBoxesToList(world, x, y, z, aabb, list, entity);
 
 		this.setBlockBoundsForItemRender();
+	}
+
+	@Override
+	public TileEntity createNewTileEntity(final World world) {
+		return new TileEntityBoiler();
 	}
 
 	@Override
@@ -182,13 +192,14 @@ public class BlockBoiler extends Block {
 				} else if (heldItem.itemID == Item.fishRaw.itemID) {
 					world.setBlockMetadataWithNotify(x, y, z, 2, 3);
 				} else {
-					System.out.println("Opening GUI!!!");
+					FMLNetworkHandler.openGui(player, UnderWaterCraft.instance,
+							0, world, x, y, z);
 				}
 
 				return true;
 			} else {
-				System.out.println("Opening GUI!!!");
-
+				FMLNetworkHandler.openGui(player, UnderWaterCraft.instance, 0,
+						world, x, y, z);
 				return true;
 			}
 		} else {
@@ -202,7 +213,6 @@ public class BlockBoiler extends Block {
 
 		if (world.getBlockMetadata(x, y, z) == 2) {
 			if (entity instanceof EntityPlayerMP) {
-				System.out.println("Collision");
 				entity.attackEntityFrom(DamageSource.inFire, 1F);
 			}
 		}

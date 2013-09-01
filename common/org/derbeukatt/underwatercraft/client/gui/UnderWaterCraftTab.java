@@ -1,4 +1,4 @@
-package org.derbeukatt.underwatercraft.gui;
+package org.derbeukatt.underwatercraft.client.gui;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;

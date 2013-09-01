@@ -1,4 +1,4 @@
-package org.derbeukatt.underwatercraft.client.particle;
+package org.derbeukatt.underwatercraft.client.fx;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EntityFX;

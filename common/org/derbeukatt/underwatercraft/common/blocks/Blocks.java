@@ -1,6 +1,6 @@
-package org.derbeukatt.underwatercraft.blocks;
+package org.derbeukatt.underwatercraft.common.blocks;
 
-import org.derbeukatt.underwatercraft.items.ItemBoilerBlock;
+import org.derbeukatt.underwatercraft.common.items.ItemBoilerBlock;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;

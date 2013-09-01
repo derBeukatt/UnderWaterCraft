@@ -1,4 +1,4 @@
-package org.derbeukatt.underwatercraft.blocks;
+package org.derbeukatt.underwatercraft.common.blocks;
 
 public class BlockInfo {
 

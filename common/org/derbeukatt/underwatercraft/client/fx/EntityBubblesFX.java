@@ -1,9 +1,9 @@
-package org.derbeukatt.underwatercraft.client.particle;
+package org.derbeukatt.underwatercraft.client.fx;
 
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.world.World;
 
-import org.derbeukatt.underwatercraft.blocks.Blocks;
+import org.derbeukatt.underwatercraft.common.blocks.Blocks;
 
 public class EntityBubblesFX extends EntityFX {
 
