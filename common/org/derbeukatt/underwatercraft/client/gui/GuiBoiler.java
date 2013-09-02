@@ -32,4 +32,9 @@ public class GuiBoiler extends GuiContainer {
 				this.ySize);
 	}
 
+	@Override
+	protected void drawGuiContainerForegroundLayer(final int x, final int y) {
+		this.fontRenderer.drawString("Blubber Boiler", 8, 6, 0x404040);
+	}
+
 }
