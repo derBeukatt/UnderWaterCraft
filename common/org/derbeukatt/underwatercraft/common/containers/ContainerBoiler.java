@@ -8,15 +8,16 @@ import org.derbeukatt.underwatercraft.common.tileentity.TileEntityBoiler;
 
 public class ContainerBoiler extends Container {
 
+	private final TileEntityBoiler boiler;
+
 	public ContainerBoiler(final InventoryPlayer inventory,
 			final TileEntityBoiler te) {
-		// TODO Auto-generated constructor stub
+		this.boiler = te;
 	}
 
 	@Override
 	public boolean canInteractWith(final EntityPlayer entityplayer) {
-		// TODO Auto-generated method stub
-		return false;
+		return this.boiler.isUseableByPlayer(entityplayer);
 	}
 
 }

@@ -30,7 +30,7 @@ public class UnderWaterCraft {
 	@Instance(ModInfo.MOD_ID)
 	public static UnderWaterCraft instance;
 
-	@SidedProxy(clientSide = "org.derbeukatt.underwatercraft.proxies.ClientProxy", serverSide = "org.derbeukatt.underwatercraft.proxies.CommonProxy")
+	@SidedProxy(clientSide = "org.derbeukatt.underwatercraft.client.ClientProxy", serverSide = "org.derbeukatt.underwatercraft.common.CommonProxy")
 	public static CommonProxy proxy;
 
 	@EventHandler
@@ -43,8 +43,11 @@ public class UnderWaterCraft {
 	@EventHandler
 	public void load(final FMLInitializationEvent event) {
 		Items.addNames();
-		Items.registerRecipes();
 		Blocks.addNames();
+
+		Items.registerRecipes();
+
+		Blocks.registerTileEntities();
 
 		new GuiHandler();
 	}

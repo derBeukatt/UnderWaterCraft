@@ -14,6 +14,8 @@ public class BlockInfo {
 
 	public static int BOILER_RENDER_ID;
 	public static final String BOILER_SIDE = "boiler_side";
+	public static final String BOILER_TE_KEY = "boilerTileEntity";
+
 	public static final String BOILER_TOP = "boiler_top";
 
 	public static final String BOILER_UNLOCALIZED_NAME = "boiler";

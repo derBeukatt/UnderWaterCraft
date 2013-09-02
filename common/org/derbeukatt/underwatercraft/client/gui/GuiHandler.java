@@ -25,8 +25,7 @@ public class GuiHandler implements IGuiHandler {
 		case 0:
 			final TileEntity te = world.getBlockTileEntity(x, y, z);
 			if ((te != null) && (te instanceof TileEntityBoiler)) {
-				return new ContainerBoiler(player.inventory,
-						(TileEntityBoiler) te);
+				return new GuiBoiler(player.inventory, (TileEntityBoiler) te);
 			}
 			break;
 		}
@@ -40,7 +39,8 @@ public class GuiHandler implements IGuiHandler {
 		case 0:
 			final TileEntity te = world.getBlockTileEntity(x, y, z);
 			if ((te != null) && (te instanceof TileEntityBoiler)) {
-				return new GuiBoiler(player.inventory, (TileEntityBoiler) te);
+				return new ContainerBoiler(player.inventory,
+						(TileEntityBoiler) te);
 			}
 
 			break;
