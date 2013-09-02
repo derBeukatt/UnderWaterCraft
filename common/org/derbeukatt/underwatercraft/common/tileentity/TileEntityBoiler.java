@@ -1,5 +1,6 @@
 package org.derbeukatt.underwatercraft.common.tileentity;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -148,4 +149,29 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 
 	}
 
+	@Override
+	public void updateEntity() {
+		if (!this.worldObj.isRemote) {
+			final int meta = this.worldObj.getBlockMetadata(this.xCoord,
+					this.yCoord, this.zCoord);
+
+			final int blockId = this.worldObj.getBlockId(this.xCoord,
+					this.yCoord - 1, this.zCoord);
+
+			if ((blockId == Block.fire.blockID)
+					|| (blockId == Block.lavaMoving.blockID)
+					|| (blockId == Block.lavaStill.blockID)) {
+
+				if (meta == 1) {
+					this.worldObj.setBlockMetadataWithNotify(this.xCoord,
+							this.yCoord, this.zCoord, 2, 3);
+				}
+			} else {
+				if (meta > 1) {
+					this.worldObj.setBlockMetadataWithNotify(this.xCoord,
+							this.yCoord, this.zCoord, 1, 3);
+				}
+			}
+		}
+	}
 }

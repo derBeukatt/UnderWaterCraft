@@ -219,6 +219,12 @@ public class BlockBoiler extends BlockContainer {
 	}
 
 	@Override
+	public void onNeighborBlockChange(final World world, final int x,
+			final int y, final int z, final int id) {
+
+	}
+
+	@Override
 	@SideOnly(Side.CLIENT)
 	public void randomDisplayTick(final World world, final int x, final int y,
 			final int z, final Random rand) {
