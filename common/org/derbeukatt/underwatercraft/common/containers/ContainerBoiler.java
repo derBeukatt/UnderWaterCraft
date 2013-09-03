@@ -3,6 +3,7 @@ package org.derbeukatt.underwatercraft.common.containers;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -13,9 +14,13 @@ import org.derbeukatt.underwatercraft.client.gui.SlotFluidContainer;
 import org.derbeukatt.underwatercraft.client.gui.SlotRawFish;
 import org.derbeukatt.underwatercraft.common.tileentity.TileEntityBoiler;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 public class ContainerBoiler extends Container {
 
 	private final TileEntityBoiler boiler;
+	private int lastCookTime;
 
 	public ContainerBoiler(final InventoryPlayer invPlayer,
 			final TileEntityBoiler te) {
@@ -38,8 +43,32 @@ public class ContainerBoiler extends Container {
 	}
 
 	@Override
+	public void addCraftingToCrafters(final ICrafting crafting) {
+		super.addCraftingToCrafters(crafting);
+		crafting.sendProgressBarUpdate(this, 0, this.boiler.cookTime);
+	}
+
+	@Override
 	public boolean canInteractWith(final EntityPlayer entityplayer) {
 		return this.boiler.isUseableByPlayer(entityplayer);
+	}
+
+	/**
+	 * Looks for changes made in the container, sends them to every listener.
+	 */
+	@Override
+	public void detectAndSendChanges() {
+		super.detectAndSendChanges();
+
+		for (int i = 0; i < this.crafters.size(); ++i) {
+			final ICrafting icrafting = (ICrafting) this.crafters.get(i);
+
+			if (this.lastCookTime != this.boiler.cookTime) {
+				icrafting.sendProgressBarUpdate(this, 0, this.boiler.cookTime);
+			}
+		}
+
+		this.lastCookTime = this.boiler.cookTime;
 	}
 
 	@Override
@@ -78,5 +107,13 @@ public class ContainerBoiler extends Container {
 		}
 
 		return null;
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void updateProgressBar(final int id, final int value) {
+		if (id == 0) {
+			this.boiler.cookTime = value;
+		}
 	}
 }

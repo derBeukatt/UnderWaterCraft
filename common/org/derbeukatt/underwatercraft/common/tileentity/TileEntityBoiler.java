@@ -23,6 +23,7 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 		ISidedInventory {
 
 	private static final int MAX_CAPACITY = 16 * FluidContainerRegistry.BUCKET_VOLUME;
+	public int cookTime;
 	private final ItemStack[] items;
 	public int renderHeight;
 	// private FluidTank blubberTank;
@@ -58,6 +59,15 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 			final int j) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	private boolean canSmelt() {
+		if (this.getStackInSlot(0) == null) {
+			return false;
+		} else {
+			/* TODO: check if there is space in second tank */
+			return true;
+		}
 	}
 
 	@Override
@@ -112,6 +122,10 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	public int[] getAccessibleSlotsFromSide(final int var1) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public int getCookProgressScaled(final int i) {
+		return (this.cookTime * i) / 200;
 	}
 
 	public FluidStack getFluid() {
@@ -259,15 +273,32 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 					|| (blockId == Block.lavaMoving.blockID)
 					|| (blockId == Block.lavaStill.blockID)) {
 
-				if (meta == 1) {
-					this.worldObj.setBlockMetadataWithNotify(this.xCoord,
-							this.yCoord, this.zCoord, 2, 3);
-				}
+				this.worldObj.setBlockMetadataWithNotify(this.xCoord,
+						this.yCoord, this.zCoord, 2, 3);
 			} else {
 				if (meta > 1) {
 					this.worldObj.setBlockMetadataWithNotify(this.xCoord,
 							this.yCoord, this.zCoord, 1, 3);
 				}
+			}
+
+			boolean inventoryChanged = false;
+
+			if ((this.worldObj.getBlockMetadata(this.xCoord, this.yCoord,
+					this.zCoord) == 2) && this.canSmelt()) {
+				++this.cookTime;
+
+				if (this.cookTime == 200) {
+					this.cookTime = 0;
+					this.decrStackSize(0, 1);
+					inventoryChanged = true;
+				}
+			} else {
+				this.cookTime = 0;
+			}
+
+			if (inventoryChanged) {
+				this.onInventoryChanged();
 			}
 		}
 	}
