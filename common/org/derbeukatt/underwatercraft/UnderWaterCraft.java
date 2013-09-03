@@ -7,6 +7,7 @@ import org.derbeukatt.underwatercraft.client.gui.CraftingHandler;
 import org.derbeukatt.underwatercraft.client.gui.GuiHandler;
 import org.derbeukatt.underwatercraft.common.CommonProxy;
 import org.derbeukatt.underwatercraft.common.blocks.Blocks;
+import org.derbeukatt.underwatercraft.common.fluids.Fluids;
 import org.derbeukatt.underwatercraft.common.items.Items;
 import org.derbeukatt.underwatercraft.network.PacketHandler;
 import org.derbeukatt.underwatercraft.util.ConfigHandler;
@@ -60,6 +61,7 @@ public class UnderWaterCraft {
 	public void preInit(final FMLPreInitializationEvent event) {
 		ConfigHandler.init(event.getSuggestedConfigurationFile());
 		Items.init();
+		Fluids.init();
 		Blocks.init();
 		GameRegistry.registerCraftingHandler(new CraftingHandler());
 		proxy.initRenderers();

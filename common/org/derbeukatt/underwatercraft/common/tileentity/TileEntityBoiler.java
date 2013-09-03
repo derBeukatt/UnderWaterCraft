@@ -17,21 +17,24 @@ import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
+import org.derbeukatt.underwatercraft.common.fluids.Fluids;
 import org.derbeukatt.underwatercraft.network.PacketHandler;
 
 public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 		ISidedInventory {
 
 	private static final int MAX_CAPACITY = 16 * FluidContainerRegistry.BUCKET_VOLUME;
+	public short blubberAmount;
+	private final FluidTank blubberTank;
+
 	public int cookTime;
 	private final ItemStack[] items;
 	public int renderHeight;
-	// private FluidTank blubberTank;
 	private FluidTank waterTank;
 
 	public TileEntityBoiler() {
 		this.items = new ItemStack[3];
-		// this.blubberTank = new FluidTank(fluid, amount, capacity)
+		this.blubberTank = new FluidTank(Fluids.blubber, 0, MAX_CAPACITY);
 		this.waterTank = new FluidTank(FluidRegistry.WATER, 0, MAX_CAPACITY);
 	}
 
@@ -66,7 +69,11 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 			return false;
 		} else {
 			/* TODO: check if there is space in second tank */
-			return true;
+			if ((this.blubberTank.getFluidAmount() + FluidContainerRegistry.BUCKET_VOLUME) <= MAX_CAPACITY) {
+				return true;
+			}
+
+			return false;
 		}
 	}
 
@@ -124,11 +131,15 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 		return null;
 	}
 
+	public FluidTank getBlubberTank() {
+		return this.blubberTank;
+	}
+
 	public int getCookProgressScaled(final int i) {
 		return (this.cookTime * i) / 200;
 	}
 
-	public FluidStack getFluid() {
+	public FluidStack getInputFluid() {
 		return this.waterTank.getFluid();
 	}
 
@@ -140,6 +151,15 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	@Override
 	public String getInvName() {
 		return "InventoryBoiler";
+	}
+
+	public FluidStack getOutputFluid() {
+		return this.blubberTank.getFluid();
+	}
+
+	public int getScaledBlubberAmount(final int i) {
+		return this.blubberAmount != 0 ? (int) (((float) this.blubberAmount / (float) (MAX_CAPACITY)) * i)
+				: 0;
 	}
 
 	public int getScaledWaterAmount(final int i) {
@@ -291,6 +311,10 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 				if (this.cookTime == 200) {
 					this.cookTime = 0;
 					this.decrStackSize(0, 1);
+					this.blubberTank.fill(new FluidStack(Fluids.blubber,
+							FluidContainerRegistry.BUCKET_VOLUME), true);
+					this.blubberAmount = (short) this.blubberTank
+							.getFluidAmount();
 					inventoryChanged = true;
 				}
 			} else {

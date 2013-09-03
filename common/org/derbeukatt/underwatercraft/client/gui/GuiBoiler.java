@@ -90,8 +90,13 @@ public class GuiBoiler extends GuiContainer {
 					176, 0, 14, 14);
 		}
 
+		/* Display water */
 		this.displayGauge(19, 8, this.boiler.getScaledWaterAmount(58),
-				this.boiler.getFluid());
+				this.boiler.getInputFluid());
+
+		/* Display blubber */
+		this.displayGauge(19, 116, this.boiler.getScaledBlubberAmount(58),
+				this.boiler.getOutputFluid());
 
 		final int scaledProgress = this.boiler.getCookProgressScaled(24);
 		this.drawTexturedModalRect(this.guiLeft + 80, this.guiTop + 41, 176,

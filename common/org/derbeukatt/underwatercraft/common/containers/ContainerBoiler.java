@@ -20,6 +20,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class ContainerBoiler extends Container {
 
 	private final TileEntityBoiler boiler;
+	private short lastBlubberAmount;
 	private int lastCookTime;
 
 	public ContainerBoiler(final InventoryPlayer invPlayer,
@@ -46,6 +47,7 @@ public class ContainerBoiler extends Container {
 	public void addCraftingToCrafters(final ICrafting crafting) {
 		super.addCraftingToCrafters(crafting);
 		crafting.sendProgressBarUpdate(this, 0, this.boiler.cookTime);
+		crafting.sendProgressBarUpdate(this, 1, this.boiler.blubberAmount);
 	}
 
 	@Override
@@ -66,9 +68,14 @@ public class ContainerBoiler extends Container {
 			if (this.lastCookTime != this.boiler.cookTime) {
 				icrafting.sendProgressBarUpdate(this, 0, this.boiler.cookTime);
 			}
+			if (this.lastBlubberAmount != this.boiler.blubberAmount) {
+				icrafting.sendProgressBarUpdate(this, 1,
+						this.boiler.blubberAmount);
+			}
 		}
 
 		this.lastCookTime = this.boiler.cookTime;
+		this.lastBlubberAmount = this.boiler.blubberAmount;
 	}
 
 	@Override
@@ -114,6 +121,8 @@ public class ContainerBoiler extends Container {
 	public void updateProgressBar(final int id, final int value) {
 		if (id == 0) {
 			this.boiler.cookTime = value;
+		} else if (id == 1) {
+			this.boiler.blubberAmount = (short) value;
 		}
 	}
 }
