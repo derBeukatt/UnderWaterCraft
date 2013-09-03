@@ -4,7 +4,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.FluidContainerRegistry;
 
+import org.derbeukatt.underwatercraft.client.gui.SlotBoilerOutput;
+import org.derbeukatt.underwatercraft.client.gui.SlotFluidContainer;
 import org.derbeukatt.underwatercraft.client.gui.SlotRawFish;
 import org.derbeukatt.underwatercraft.common.tileentity.TileEntityBoiler;
 
@@ -28,8 +33,8 @@ public class ContainerBoiler extends Container {
 		}
 
 		this.addSlotToContainer(new SlotRawFish(this.boiler, 0, 52, 41));
-		this.addSlotToContainer(new Slot(this.boiler, 1, 137, 19));
-		this.addSlotToContainer(new Slot(this.boiler, 2, 137, 61));
+		this.addSlotToContainer(new SlotFluidContainer(this.boiler, 1, 137, 19));
+		this.addSlotToContainer(new SlotBoilerOutput(this.boiler, 2, 137, 61));
 	}
 
 	@Override
@@ -37,4 +42,41 @@ public class ContainerBoiler extends Container {
 		return this.boiler.isUseableByPlayer(entityplayer);
 	}
 
+	@Override
+	public ItemStack transferStackInSlot(final EntityPlayer player, final int i) {
+		final Slot slot = this.getSlot(i);
+
+		if ((slot != null) && slot.getHasStack()) {
+			final ItemStack stack = slot.getStack();
+			final ItemStack result = stack.copy();
+
+			if (i >= 36) {
+				if (!this.mergeItemStack(stack, 0, 36, false)) {
+					return null;
+				}
+			} else if (stack.itemID == Item.fishRaw.itemID) {
+				if (!this.mergeItemStack(stack, 36, 37, false)) {
+					return null;
+				}
+			} else if (FluidContainerRegistry.isEmptyContainer(stack)) {
+				if (!this.mergeItemStack(stack, 37, 38, false)) {
+					return null;
+				}
+			} else {
+				return null;
+			}
+
+			if (stack.stackSize == 0) {
+				slot.putStack(null);
+			} else {
+				slot.onSlotChanged();
+			}
+
+			slot.onPickupFromSlot(player, stack);
+
+			return result;
+		}
+
+		return null;
+	}
 }

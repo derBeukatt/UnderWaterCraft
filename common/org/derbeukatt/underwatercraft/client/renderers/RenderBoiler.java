@@ -1,12 +1,13 @@
 package org.derbeukatt.underwatercraft.client.renderers;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockFluid;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.Icon;
 import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.fluids.FluidRegistry;
 
+import org.derbeukatt.underwatercraft.common.tileentity.TileEntityBoiler;
 import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
@@ -89,28 +90,33 @@ public class RenderBoiler implements ISimpleBlockRenderingHandler {
 		renderer.setRenderBounds(0F, 0.4F, 0.9375F, 1F, 1F, 1F);
 		renderStandardInvBlock(renderer, block, metadata);
 
-		if (metadata > 0) {
-			final Icon icon = BlockFluid.func_94424_b("water_still");
+		// if (metadata > 0) {
+		// final Icon icon = BlockFluid.func_94424_b("water_still");
+		//
+		// renderer.setRenderBounds(0.0625F, 0.4F, 0.0625F, 0.9375F, 0.9F,
+		// 0.9375F);
+		//
+		// final Tessellator tessellator = Tessellator.instance;
+		//
+		// GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
+		//
+		// tessellator.startDrawingQuads();
+		// tessellator.setNormal(0.0F, 1.0F, 0.0F);
+		// renderer.renderFaceYPos(block, 0.0D, 0.0D, 0.0D, icon);
+		// tessellator.draw();
+		//
+		// GL11.glTranslatef(0.5F, 0.5F, 0.5F);
+		// }
 
-			renderer.setRenderBounds(0.0625F, 0.4F, 0.0625F, 0.9375F, 0.9F, 0.9375F);
-
-			final Tessellator tessellator = Tessellator.instance;
-
-			GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
-
-			tessellator.startDrawingQuads();
-			tessellator.setNormal(0.0F, 1.0F, 0.0F);
-			renderer.renderFaceYPos(block, 0.0D, 0.0D, 0.0D, icon);
-			tessellator.draw();
-
-			GL11.glTranslatef(0.5F, 0.5F, 0.5F);
-		}
 	}
 
 	@Override
 	public boolean renderWorldBlock(final IBlockAccess world, final int x,
 			final int y, final int z, final Block block, final int modelId,
 			final RenderBlocks renderer) {
+
+		final TileEntityBoiler te = (TileEntityBoiler) world
+				.getBlockTileEntity(x, y, z);
 
 		Tessellator.instance.setColorOpaque_F(1F, 1F, 1F);
 
@@ -138,12 +144,25 @@ public class RenderBoiler implements ISimpleBlockRenderingHandler {
 		renderer.setRenderBounds(0F, 0.4F, 0.9375F, 1F, 1F, 1F);
 		renderer.renderStandardBlock(block, x, y, z);
 
-		final int meta = world.getBlockMetadata(x, y, z);
+		// final int meta = world.getBlockMetadata(x, y, z);
 
-		if (meta > 0) {
-			final Icon icon = BlockFluid.func_94424_b("water_still");
+		// if (meta > 0) {
+		// final Icon icon = BlockFluid.func_94424_b("water_still");
+		//
+		// renderer.setRenderBounds(0.0625F, 0.4F, 0.0625F, 0.9375F, 0.9F,
+		// 0.9375F);
+		// renderer.renderFaceYPos(block, x, y, z, icon);
+		// }
 
-			renderer.setRenderBounds(0.0625F, 0.4F, 0.0625F, 0.9375F, 0.9F, 0.9375F);
+		final int amount = te.renderHeight;
+
+		if (amount > 0) {
+			final float fillStand = 0.00003125F * amount;
+
+			final Icon icon = FluidRegistry.WATER.getIcon();
+
+			renderer.setRenderBounds(0.0625F, 0.4F, 0.0625F, 0.9375F,
+					0.4F + fillStand, 0.9375F);
 			renderer.renderFaceYPos(block, x, y, z, icon);
 		}
 

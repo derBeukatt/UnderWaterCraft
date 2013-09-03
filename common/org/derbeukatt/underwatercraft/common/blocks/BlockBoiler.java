@@ -20,6 +20,7 @@ import net.minecraft.util.Icon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
@@ -147,23 +148,28 @@ public class BlockBoiler extends BlockContainer {
 	public boolean onBlockActivated(final World world, final int x,
 			final int y, final int z, final EntityPlayer player,
 			final int side, final float hitX, final float hitY, final float hitZ) {
+
 		if (!world.isRemote) {
+
+			final TileEntityBoiler te = (TileEntityBoiler) world
+					.getBlockTileEntity(x, y, z);
+
 			final ItemStack heldItem = player.inventory.getCurrentItem();
 			if (heldItem != null) {
 				final FluidStack fluid = FluidContainerRegistry
 						.getFluidForFilledItem(player.getCurrentEquippedItem());
 
 				if (fluid != null) {
-					if (world.getBlockMetadata(x, y, z) == 0) {
-						if (!player.capabilities.isCreativeMode) {
-							player.inventory.setInventorySlotContents(
-									player.inventory.currentItem,
-									consumeItem(heldItem));
 
-						}
-						world.setBlockMetadataWithNotify(x, y, z, 1, 3);
+					if (!player.capabilities.isCreativeMode) {
+						player.inventory.setInventorySlotContents(
+								player.inventory.currentItem,
+								consumeItem(heldItem));
 
 					}
+					te.fill(ForgeDirection.getOrientation(side), fluid, true);
+					// world.setBlockMetadataWithNotify(x, y, z, 1, 3);
+
 				} else if (FluidContainerRegistry.isBucket(heldItem)) {
 					if (world.getBlockMetadata(x, y, z) > 0) {
 						final ItemStack fillStack = new ItemStack(
