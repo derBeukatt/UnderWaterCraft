@@ -7,6 +7,8 @@ import java.io.IOException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
 
 import org.derbeukatt.underwatercraft.ModInfo;
 import org.derbeukatt.underwatercraft.common.tileentity.TileEntityBoiler;
@@ -75,6 +77,9 @@ public class PacketHandler implements IPacketHandler {
 			final short renderHeight = reader.readShort();
 
 			te.renderHeight = renderHeight;
+
+			te.getWaterTank().setFluid(
+					new FluidStack(FluidRegistry.WATER, renderHeight));
 
 			entityPlayer.worldObj.markBlockForRenderUpdate(x, y, z);
 			break;

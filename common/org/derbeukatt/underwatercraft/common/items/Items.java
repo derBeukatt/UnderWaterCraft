@@ -1,89 +1,99 @@
 package org.derbeukatt.underwatercraft.common.items;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.LanguageRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.oredict.OreDictionary;
+
+import org.derbeukatt.underwatercraft.common.blocks.BlockInfo;
+
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.LanguageRegistry;
 
 public class Items {
 
-    public static Item itemScale;
-    public static Item itemScaleHard;
-    public static Item itemScalePlate;
-    public static Item itemWhetstone;
-    public static Item itemScalingKnife;
+	public static Item itemBlubberBucket;
+	public static Item itemScale;
+	public static Item itemScaleHard;
+	public static Item itemScalePlate;
+	public static Item itemScalingKnife;
+	public static Item itemWhetstone;
 
-    public static void init()
-    {
-        LanguageRegistry.instance().addStringLocalization("itemGroup.tabUnderWaterCraft", "UnderWaterCraft");
+	public static void addNames() {
+		LanguageRegistry.addName(itemScale, ItemInfo.SCALE_NAME);
+		LanguageRegistry.addName(itemScaleHard, ItemInfo.HARD_SCALE_NAME);
+		LanguageRegistry.addName(itemScalePlate, ItemInfo.SCALE_PLATE_NAME);
+		LanguageRegistry.addName(itemWhetstone, ItemInfo.WHETSTONE_NAME);
+		LanguageRegistry.addName(itemScalingKnife, ItemInfo.SCALING_KNIFE_NAME);
+		LanguageRegistry.addName(itemBlubberBucket,
+				ItemInfo.BLUBBER_BUCKET_NAME);
+	}
 
-        itemScale = new ItemScale(ItemInfo.SCALE_ID);
-        itemScaleHard = new ItemScaleHard(ItemInfo.HARD_SCALE_ID);
-        itemScalePlate = new ItemScalePlate(ItemInfo.SCALE_PLATE_ID);
+	public static void init() {
+		LanguageRegistry.instance().addStringLocalization(
+				"itemGroup.tabUnderWaterCraft", "UnderWaterCraft");
 
-        itemWhetstone = new ItemWhetstone(ItemInfo.WHETSTONE_ID);
-        itemScalingKnife = new ItemScalingKnife(ItemInfo.SCALING_KNIFE_ID);
-    }
+		itemScale = new ItemScale(ItemInfo.SCALE_ID);
+		itemScaleHard = new ItemScaleHard(ItemInfo.HARD_SCALE_ID);
+		itemScalePlate = new ItemScalePlate(ItemInfo.SCALE_PLATE_ID);
 
-    public static void addNames()
-    {
-        LanguageRegistry.addName(itemScale, ItemInfo.SCALE_NAME);
-        LanguageRegistry.addName(itemScaleHard, ItemInfo.HARD_SCALE_NAME);
-        LanguageRegistry.addName(itemScalePlate, ItemInfo.SCALE_PLATE_NAME);
-        LanguageRegistry.addName(itemWhetstone, ItemInfo.WHETSTONE_NAME);
-        LanguageRegistry.addName(itemScalingKnife, ItemInfo.SCALING_KNIFE_NAME);
-    }
+		itemWhetstone = new ItemWhetstone(ItemInfo.WHETSTONE_ID);
+		itemScalingKnife = new ItemScalingKnife(ItemInfo.SCALING_KNIFE_ID);
 
-    public static void registerRecipes()
-    {
-        GameRegistry.addShapelessRecipe(new ItemStack(itemScale),
-                new Object[]{
-                        new ItemStack(itemScalingKnife, 1, OreDictionary.WILDCARD_VALUE),
-                        new ItemStack(Item.fishRaw)
-                });
-        GameRegistry.addRecipe(new ItemStack(itemScaleHard),
-                new Object[]{ "ss",
-                              "ss",
+		itemBlubberBucket = new ItemCustomBucket(ItemInfo.BLUBBER_BUCKET_ID,
+				BlockInfo.BLUBBER_ID).setUnlocalizedName(
+				ItemInfo.BLUBBER_BUCKET_UNLOCALIZED_NAME).setContainerItem(
+				Item.bucketEmpty);
+	}
 
-                              's', itemScale
-                });
+	public static void registerFluidContainers() {
+		FluidContainerRegistry.registerFluidContainer(
+				FluidRegistry.getFluidStack("blubber",
+						FluidContainerRegistry.BUCKET_VOLUME), new ItemStack(
+						itemBlubberBucket), new ItemStack(Item.bucketEmpty));
+	}
 
-        GameRegistry.addRecipe(new ItemStack(itemScalePlate),
-                new Object[]{   "ss",
+	public static void registerRecipes() {
+		GameRegistry.addShapelessRecipe(new ItemStack(itemScale),
+				new Object[] {
+						new ItemStack(itemScalingKnife, 1,
+								OreDictionary.WILDCARD_VALUE),
+						new ItemStack(Item.fishRaw) });
+		GameRegistry.addRecipe(new ItemStack(itemScaleHard), new Object[] {
+				"ss", "ss",
 
-                                's', itemScaleHard
-                });
+				's', itemScale });
 
-        GameRegistry.addRecipe(new ItemStack(itemWhetstone),
-                new Object[]{ "sss",
-                              "iii",
-                              "ccc",
+		GameRegistry.addRecipe(new ItemStack(itemScalePlate), new Object[] {
+				"ss",
 
-                              's', Block.sand,
-                              'i', Item.ingotIron,
-                              'c', Block.stone
-                });
+				's', itemScaleHard });
 
-        GameRegistry.addRecipe(new ItemStack(itemScalingKnife),
-                new Object[]{ "i ",
-                              "bw",
+		GameRegistry.addRecipe(new ItemStack(itemWhetstone), new Object[] {
+				"sss", "iii", "ccc",
 
-                              'i', new ItemStack(itemScalingKnife, 1 , OreDictionary.WILDCARD_VALUE),
-                              'b', Item.bucketWater,
-                              'w', new ItemStack(itemWhetstone, 1, OreDictionary.WILDCARD_VALUE)
-                });
+				's', Block.sand, 'i', Item.ingotIron, 'c', Block.stone });
 
-        GameRegistry.addRecipe(new ItemStack(itemScalingKnife, 1, 64),
-                new Object[]{ "f  ",
-                              " i ",
-                              "  s",
+		GameRegistry.addRecipe(new ItemStack(itemScalingKnife),
+				new Object[] {
+						"i ",
+						"bw",
 
-                              'f', Item.flint,
-                              'i', Item.ingotIron,
-                              's', Item.stick
-                });
-    }
+						'i',
+						new ItemStack(itemScalingKnife, 1,
+								OreDictionary.WILDCARD_VALUE),
+						'b',
+						Item.bucketWater,
+						'w',
+						new ItemStack(itemWhetstone, 1,
+								OreDictionary.WILDCARD_VALUE) });
+
+		GameRegistry.addRecipe(new ItemStack(itemScalingKnife, 1, 64),
+				new Object[] { "f  ", " i ", "  s",
+
+				'f', Item.flint, 'i', Item.ingotIron, 's', Item.stick });
+	}
 
 }

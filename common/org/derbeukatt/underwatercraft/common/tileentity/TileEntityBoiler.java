@@ -29,13 +29,14 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 
 	public int cookTime;
 	private final ItemStack[] items;
+	private int oldRenderHeight;
 	public int renderHeight;
-	private FluidTank waterTank;
+	private final FluidTank waterTank;
 
 	public TileEntityBoiler() {
 		this.items = new ItemStack[3];
-		this.blubberTank = new FluidTank(Fluids.blubber, 0, MAX_CAPACITY);
-		this.waterTank = new FluidTank(FluidRegistry.WATER, 0, MAX_CAPACITY);
+		this.blubberTank = new FluidTank(MAX_CAPACITY);
+		this.waterTank = new FluidTank(MAX_CAPACITY);
 	}
 
 	@Override
@@ -118,9 +119,6 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 			final boolean doFill) {
 		final int amount = this.waterTank.fill(resource, doFill);
 		this.renderHeight = this.waterTank.getFluidAmount();
-
-		PacketHandler.sendRenderHeight((short) this.renderHeight, this.xCoord,
-				this.yCoord, this.zCoord);
 
 		return amount;
 	}
@@ -265,7 +263,30 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 			}
 		}
 
-		this.waterTank = this.waterTank.readFromNBT(compound);
+		// this.waterTank = this.waterTank.readFromNBT(compound);
+		// this.blubberTank = this.blubberTank.readFromNBT(compound);
+
+		final int idWater = compound.getInteger("itemIDWater");
+		final int amountWater = compound.getInteger("amountWater");
+
+		System.out.println("Read water fluid id: " + idWater);
+		System.out.println("Read water fluid amount: " + amountWater);
+
+		this.waterTank.setFluid(new FluidStack(idWater, amountWater));
+
+		final int idBlubber = compound.getInteger("itemIDBlubber");
+		final int amountBlubber = compound.getInteger("amountBlubber");
+
+		System.out.println("Read blubber fluid id: " + idBlubber);
+		System.out.println("Read blubber fluid amount: " + amountBlubber);
+
+		this.blubberTank.setFluid(new FluidStack(idBlubber, amountBlubber));
+
+		this.renderHeight = compound.getShort("renderHeight");
+		this.blubberAmount = compound.getShort("blubberAmount");
+
+		System.out.println("Read gui blubber amount: " + this.blubberAmount);
+		System.out.println("Read gui water amount: " + this.renderHeight);
 	}
 
 	@Override
@@ -321,8 +342,13 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 				this.cookTime = 0;
 			}
 
+			if (this.oldRenderHeight != this.renderHeight) {
+				PacketHandler.sendRenderHeight((short) this.renderHeight,
+						this.xCoord, this.yCoord, this.zCoord);
+			}
+
 			if (inventoryChanged) {
-				this.onInventoryChanged();
+				// this.onInventoryChanged();
 			}
 		}
 	}
@@ -345,6 +371,28 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 
 		compound.setTag("Items", items);
 
-		this.waterTank.writeToNBT(compound);
+		FluidStack liquid = this.waterTank.getFluid();
+		if (liquid != null) {
+			compound.setInteger("itemIDWater", liquid.fluidID);
+			compound.setInteger("amountWater", liquid.amount);
+
+			System.out.println("Save water fluid id: " + liquid.fluidID);
+			System.out.println("Save water fluid amount: " + liquid.amount);
+		}
+
+		liquid = this.blubberTank.getFluid();
+		if (liquid != null) {
+			compound.setInteger("itemIDBlubber", liquid.fluidID);
+			compound.setInteger("amountBlubber", liquid.amount);
+
+			System.out.println("Save blubber fluid id: " + liquid.fluidID);
+			System.out.println("Save blubber fluid amount: " + liquid.amount);
+		}
+
+		compound.setShort("renderHeight", (short) this.renderHeight);
+		compound.setShort("blubberAmount", this.blubberAmount);
+
+		System.out.println("Save gui blubber amount: " + this.blubberAmount);
+		System.out.println("Save gui water amount: " + this.renderHeight);
 	}
 }

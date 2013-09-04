@@ -8,10 +8,12 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidStack;
 
 import org.derbeukatt.underwatercraft.client.gui.SlotBoilerOutput;
 import org.derbeukatt.underwatercraft.client.gui.SlotFluidContainer;
 import org.derbeukatt.underwatercraft.client.gui.SlotRawFish;
+import org.derbeukatt.underwatercraft.common.fluids.Fluids;
 import org.derbeukatt.underwatercraft.common.tileentity.TileEntityBoiler;
 
 import cpw.mods.fml.relauncher.Side;
@@ -123,6 +125,8 @@ public class ContainerBoiler extends Container {
 			this.boiler.cookTime = value;
 		} else if (id == 1) {
 			this.boiler.blubberAmount = (short) value;
+			this.boiler.getBlubberTank().setFluid(
+					new FluidStack(Fluids.blubber, value));
 		}
 	}
 }
