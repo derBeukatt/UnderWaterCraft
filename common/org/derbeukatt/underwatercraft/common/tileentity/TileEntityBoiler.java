@@ -66,7 +66,8 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	}
 
 	private boolean canSmelt() {
-		if (this.getStackInSlot(0) == null) {
+		if ((this.getStackInSlot(0) == null)
+				|| (this.getWaterTank().getFluidAmount() < FluidContainerRegistry.BUCKET_VOLUME)) {
 			return false;
 		} else {
 			/* TODO: check if there is space in second tank */
@@ -93,7 +94,7 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 				this.setInventorySlotContents(i, null);
 			} else {
 				itemStack = itemStack.splitStack(count);
-				this.onInventoryChanged();
+				// this.onInventoryChanged();
 			}
 		}
 
@@ -224,16 +225,23 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 		final ItemStack destStack = this.getStackInSlot(2);
 		if (destStack == null) {
 			final ItemStack stackInSlot = this.getStackInSlot(1);
-			if (stackInSlot != null) {
+			if ((stackInSlot != null)
+					&& !(this.blubberTank.getFluidAmount() < FluidContainerRegistry.BUCKET_VOLUME)) {
 				final Item item = stackInSlot.getItem();
 				if (item != null) {
 					this.decrStackSize(1, 1);
 
 					final ItemStack filledContainer = FluidContainerRegistry
-							.fillFluidContainer(new FluidStack(
-									FluidRegistry.WATER,
+							.fillFluidContainer(new FluidStack(Fluids.blubber,
 									FluidContainerRegistry.BUCKET_VOLUME),
 									new ItemStack(item));
+
+					this.blubberTank.setFluid(new FluidStack(Fluids.blubber,
+							this.blubberTank.getFluidAmount()
+									- FluidContainerRegistry.BUCKET_VOLUME));
+
+					this.blubberAmount = (short) this.blubberTank
+							.getFluidAmount();
 
 					this.setInventorySlotContents(2, filledContainer);
 				}
@@ -332,6 +340,10 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 				if (this.cookTime == 200) {
 					this.cookTime = 0;
 					this.decrStackSize(0, 1);
+					this.waterTank.setFluid(new FluidStack(FluidRegistry.WATER,
+							this.waterTank.getFluidAmount()
+									- FluidContainerRegistry.BUCKET_VOLUME));
+					this.renderHeight = this.waterTank.getFluidAmount();
 					this.blubberTank.fill(new FluidStack(Fluids.blubber,
 							FluidContainerRegistry.BUCKET_VOLUME), true);
 					this.blubberAmount = (short) this.blubberTank
