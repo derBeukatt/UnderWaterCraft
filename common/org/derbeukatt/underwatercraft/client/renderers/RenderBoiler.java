@@ -154,12 +154,18 @@ public class RenderBoiler implements ISimpleBlockRenderingHandler {
 		// renderer.renderFaceYPos(block, x, y, z, icon);
 		// }
 
-		final int amount = te.renderHeight;
+		final int amount = Math.max(te.renderHeight, te.blubberAmount);
 
 		if (amount > 0) {
 			final float fillStand = 0.00003125F * amount;
 
-			final Icon icon = FluidRegistry.WATER.getIcon();
+			Icon icon = null;
+
+			if (te.blubberAmount > 0) {
+				icon = FluidRegistry.getFluid("blubber").getIcon();
+			} else {
+				icon = FluidRegistry.WATER.getIcon();
+			}
 
 			renderer.setRenderBounds(0.0625F, 0.4F, 0.0625F, 0.9375F,
 					0.4F + fillStand, 0.9375F);

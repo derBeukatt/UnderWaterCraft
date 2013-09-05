@@ -235,17 +235,29 @@ public class BlockBoiler extends BlockContainer {
 	public void randomDisplayTick(final World world, final int x, final int y,
 			final int z, final Random rand) {
 
-		if (world.getBlockMetadata(x, y, z) == 2) {
-			final float particleX = x
-					+ ((rand.nextFloat() * (0.75F - 0.25F)) + 0.25F);
-			final float particleY = y
-					+ ((rand.nextFloat() * (0.925F - 0.9F)) + 0.9F);
-			final float particleZ = z
-					+ ((rand.nextFloat() * (0.75F - 0.25F)) + 0.25F);
+		final TileEntity blockTileEntity = world.getBlockTileEntity(x, y, z);
 
-			for (int i = 0; i < NR_OF_PARTICLES; i++) {
-				Particles.BOILERBUBBLES.spawnParticle(world, particleX,
-						particleY, particleZ, 0.0D, 0.0D, 0.0D);
+		if (blockTileEntity instanceof TileEntityBoiler) {
+			final TileEntityBoiler tileBoiler = (TileEntityBoiler) blockTileEntity;
+
+			if (tileBoiler != null) {
+				if ((world.getBlockMetadata(x, y, z) == 2)
+						&& (tileBoiler.getWaterTank().getFluidAmount() > 0)) {
+
+					final float fillStand = 0.00003125F * tileBoiler.renderHeight;
+
+					final float particleX = x
+							+ ((rand.nextFloat() * (0.75F - 0.25F)) + 0.25F);
+					final float particleY = y
+							+ ((rand.nextFloat() * ((0.425F + fillStand) - (0.4F + fillStand))) + (0.4F + fillStand));
+					final float particleZ = z
+							+ ((rand.nextFloat() * (0.75F - 0.25F)) + 0.25F);
+
+					for (int i = 0; i < NR_OF_PARTICLES; i++) {
+						Particles.BOILERBUBBLES.spawnParticle(world, particleX,
+								particleY, particleZ, 0.0D, 0.0D, 0.0D);
+					}
+				}
 			}
 		}
 	}
