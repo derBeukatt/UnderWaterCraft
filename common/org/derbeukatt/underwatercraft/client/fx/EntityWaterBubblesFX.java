@@ -5,11 +5,11 @@ import net.minecraft.world.World;
 
 import org.derbeukatt.underwatercraft.common.blocks.Blocks;
 
-public class EntityBubblesFX extends EntityFX {
+public class EntityWaterBubblesFX extends EntityFX {
 
-	public EntityBubblesFX(final World world, final double x, final double y,
-			final double z, final double motionX, final double motionY,
-			final double motionZ) {
+	public EntityWaterBubblesFX(final World world, final double x,
+			final double y, final double z, final double motionX,
+			final double motionY, final double motionZ) {
 		super(world, x, y, z, motionX, motionY, motionZ);
 
 		this.func_110125_a(Blocks.boiler.particleIcon);
@@ -19,6 +19,7 @@ public class EntityBubblesFX extends EntityFX {
 		this.particleRed = 0F;
 		this.particleGreen = 0.1F;
 		this.particleBlue = 1F;
+		this.particleMaxAge = 2;
 	}
 
 	@Override

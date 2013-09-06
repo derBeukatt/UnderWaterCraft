@@ -81,11 +81,13 @@ public class GuiBoiler extends GuiContainer {
 			final int y) {
 		GL11.glColor4f(1F, 1F, 1F, 1F);
 		this.mc.renderEngine.func_110577_a(TEXTURE);
+
+		/* Dray main gui */
 		this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize,
 				this.ySize);
 
-		if (this.boiler.worldObj.getBlockMetadata(this.boiler.xCoord,
-				this.boiler.yCoord, this.boiler.zCoord) > 1) {
+		/* Draw boiling animation */
+		if (this.boiler.isBoiling()) {
 			this.drawTexturedModalRect(this.guiLeft + 53, this.guiTop + 60,
 					176, 0, 14, 14);
 		}

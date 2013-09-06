@@ -7,6 +7,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.INetworkManager;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.Packet132TileEntityData;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
@@ -18,7 +21,6 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
 import org.derbeukatt.underwatercraft.common.fluids.Fluids;
-import org.derbeukatt.underwatercraft.network.PacketHandler;
 
 public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 		ISidedInventory {
@@ -28,15 +30,16 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	private final FluidTank blubberTank;
 
 	public int cookTime;
+	private boolean isBoiling;
 	private final ItemStack[] items;
-	private int oldRenderHeight;
+
 	public int renderHeight;
 	private final FluidTank waterTank;
 
 	public TileEntityBoiler() {
 		this.items = new ItemStack[3];
-		this.blubberTank = new FluidTank(MAX_CAPACITY);
-		this.waterTank = new FluidTank(MAX_CAPACITY);
+		this.blubberTank = new FluidTank(Fluids.blubber, 0, MAX_CAPACITY);
+		this.waterTank = new FluidTank(FluidRegistry.WATER, 0, MAX_CAPACITY);
 	}
 
 	@Override
@@ -66,7 +69,8 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 
 	private boolean canSmelt() {
 		if ((this.getStackInSlot(0) == null)
-				|| (this.getWaterTank().getFluidAmount() < FluidContainerRegistry.BUCKET_VOLUME)) {
+				|| (this.getWaterTank().getFluidAmount() < FluidContainerRegistry.BUCKET_VOLUME)
+				|| !this.isBoiling) {
 			return false;
 		} else {
 			/* TODO: check if there is space in second tank */
@@ -119,6 +123,7 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 			final boolean doFill) {
 		final int amount = this.waterTank.fill(resource, doFill);
 		this.renderHeight = this.waterTank.getFluidAmount();
+		this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
 
 		return amount;
 	}
@@ -135,6 +140,16 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 
 	public int getCookProgressScaled(final int i) {
 		return (this.cookTime * i) / 200;
+	}
+
+	@Override
+	public Packet getDescriptionPacket() {
+		final NBTTagCompound tag = new NBTTagCompound();
+		tag.setInteger("renderHeight", this.renderHeight);
+		tag.setInteger("blubberAmount", this.blubberAmount);
+		tag.setBoolean("isBoiling", this.isBoiling);
+		return new Packet132TileEntityData(this.xCoord, this.yCoord,
+				this.zCoord, 1, tag);
 	}
 
 	public FluidStack getInputFluid() {
@@ -197,6 +212,10 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 		return this.waterTank;
 	}
 
+	public boolean isBoiling() {
+		return this.isBoiling;
+	}
+
 	@Override
 	public boolean isInvNameLocalized() {
 		return false;
@@ -217,6 +236,24 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	public boolean isUseableByPlayer(final EntityPlayer entityplayer) {
 		return entityplayer.getDistanceSq(this.xCoord + 0.5, this.yCoord + 0.5,
 				this.zCoord + 0.5) <= 64;
+	}
+
+	@Override
+	public void onDataPacket(final INetworkManager net,
+			final Packet132TileEntityData packet) {
+		final NBTTagCompound tag = packet.customParam1;
+
+		this.renderHeight = tag.getInteger("renderHeight");
+		this.blubberAmount = (short) tag.getInteger("blubberAmount");
+
+		this.waterTank.setFluid(new FluidStack(FluidRegistry.WATER,
+				this.renderHeight));
+		this.blubberTank.setFluid(new FluidStack(Fluids.blubber,
+				this.blubberAmount));
+
+		this.isBoiling = tag.getBoolean("isBoiling");
+		this.worldObj.markBlockForRenderUpdate(this.xCoord, this.yCoord,
+				this.zCoord);
 	}
 
 	@Override
@@ -303,9 +340,6 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	@Override
 	public void updateEntity() {
 		if (!this.worldObj.isRemote) {
-			final int meta = this.worldObj.getBlockMetadata(this.xCoord,
-					this.yCoord, this.zCoord);
-
 			final int blockId = this.worldObj.getBlockId(this.xCoord,
 					this.yCoord - 1, this.zCoord);
 
@@ -313,19 +347,20 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 					|| (blockId == Block.lavaMoving.blockID)
 					|| (blockId == Block.lavaStill.blockID)) {
 
-				this.worldObj.setBlockMetadataWithNotify(this.xCoord,
-						this.yCoord, this.zCoord, 2, 3);
+				if (!this.isBoiling) {
+					this.isBoiling = true;
+					this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord,
+							this.zCoord);
+				}
 			} else {
-				if (meta > 1) {
-					this.worldObj.setBlockMetadataWithNotify(this.xCoord,
-							this.yCoord, this.zCoord, 1, 3);
+				if (this.isBoiling) {
+					this.isBoiling = false;
+					this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord,
+							this.zCoord);
 				}
 			}
 
-			boolean inventoryChanged = false;
-
-			if ((this.worldObj.getBlockMetadata(this.xCoord, this.yCoord,
-					this.zCoord) == 2) && this.canSmelt()) {
+			if (this.canSmelt()) {
 				++this.cookTime;
 
 				if (this.cookTime == 200) {
@@ -339,20 +374,12 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 							FluidContainerRegistry.BUCKET_VOLUME), true);
 					this.blubberAmount = (short) this.blubberTank
 							.getFluidAmount();
-					inventoryChanged = true;
+
+					this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord,
+							this.zCoord);
 				}
 			} else {
 				this.cookTime = 0;
-			}
-
-			if (this.oldRenderHeight != this.renderHeight) {
-				PacketHandler.sendRenderHeight((short) this.renderHeight,
-						this.xCoord, this.yCoord, this.zCoord);
-				this.oldRenderHeight = this.renderHeight;
-			}
-
-			if (inventoryChanged) {
-				// this.onInventoryChanged();
 			}
 		}
 	}

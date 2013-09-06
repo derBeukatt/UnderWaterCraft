@@ -195,8 +195,6 @@ public class BlockBoiler extends BlockContainer {
 
 						world.setBlockMetadataWithNotify(x, y, z, 0, 3);
 					}
-				} else if (heldItem.itemID == Item.fishRaw.itemID) {
-					world.setBlockMetadataWithNotify(x, y, z, 2, 3);
 				} else {
 					FMLNetworkHandler.openGui(player, UnderWaterCraft.instance,
 							0, world, x, y, z);
@@ -241,21 +239,47 @@ public class BlockBoiler extends BlockContainer {
 			final TileEntityBoiler tileBoiler = (TileEntityBoiler) blockTileEntity;
 
 			if (tileBoiler != null) {
-				if ((world.getBlockMetadata(x, y, z) == 2)
-						&& (tileBoiler.getWaterTank().getFluidAmount() > 0)) {
+				if (tileBoiler.isBoiling()) {
 
-					final float fillStand = 0.00003125F * tileBoiler.renderHeight;
+					float fillStand = 0.0F;
+					float particleX = 0.0F;
+					float particleY = 0.0F;
+					float particleZ = 0.0F;
 
-					final float particleX = x
-							+ ((rand.nextFloat() * (0.75F - 0.25F)) + 0.25F);
-					final float particleY = y
-							+ ((rand.nextFloat() * ((0.425F + fillStand) - (0.4F + fillStand))) + (0.4F + fillStand));
-					final float particleZ = z
-							+ ((rand.nextFloat() * (0.75F - 0.25F)) + 0.25F);
+					if (tileBoiler.renderHeight > 0) {
 
-					for (int i = 0; i < NR_OF_PARTICLES; i++) {
-						Particles.BOILERBUBBLES.spawnParticle(world, particleX,
-								particleY, particleZ, 0.0D, 0.0D, 0.0D);
+						fillStand = 0.00003125F * tileBoiler.renderHeight;
+
+						particleX = x
+								+ ((rand.nextFloat() * (0.4375F - 0.0625F)) + 0.0625F);
+						particleY = y
+								+ ((rand.nextFloat() * ((0.425F + fillStand) - (0.4F + fillStand))) + (0.4F + fillStand));
+						particleZ = z
+								+ ((rand.nextFloat() * (0.9375F - 0.0625F)) + 0.0625F);
+
+						for (int i = 0; i < NR_OF_PARTICLES; i++) {
+							Particles.BOILERWATERBUBBLES.spawnParticle(world,
+									particleX, particleY, particleZ, 0.0D,
+									0.0D, 0.0D);
+						}
+					}
+
+					if (tileBoiler.blubberAmount > 0) {
+
+						fillStand = 0.00003125F * tileBoiler.blubberAmount;
+
+						particleX = x
+								+ ((rand.nextFloat() * (0.9375F - 0.5625F)) + 0.5625F);
+						particleY = y
+								+ ((rand.nextFloat() * ((0.425F + fillStand) - (0.4F + fillStand))) + (0.4F + fillStand));
+						particleZ = z
+								+ ((rand.nextFloat() * (0.9375F - 0.0625F)) + 0.0625F);
+
+						for (int i = 0; i < NR_OF_PARTICLES; i++) {
+							Particles.BOILERBLUBBERBUBBLES.spawnParticle(world,
+									particleX, particleY, particleZ, 0.0D,
+									0.0D, 0.0D);
+						}
 					}
 				}
 			}

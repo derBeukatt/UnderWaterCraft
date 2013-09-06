@@ -5,7 +5,7 @@ import net.minecraft.client.particle.EntityFX;
 import net.minecraft.world.World;
 
 public enum Particles {
-	BOILERBUBBLES;
+	BOILERBLUBBERBUBBLES, BOILERWATERBUBBLES;
 
 	public void spawnParticle(final World world, final double x,
 			final double y, final double z, final double motionX,
@@ -31,9 +31,13 @@ public enum Particles {
 
 			EntityFX particleEffect = null;
 			switch (this) {
-			case BOILERBUBBLES:
-				particleEffect = new EntityBubblesFX(world, x, y, z, motionX,
-						motionY, motionZ);
+			case BOILERWATERBUBBLES:
+				particleEffect = new EntityWaterBubblesFX(world, x, y, z,
+						motionX, motionY, motionZ);
+				break;
+			case BOILERBLUBBERBUBBLES:
+				particleEffect = new EntityBlubberBubblesFX(world, x, y, z,
+						motionX, motionY, motionZ);
 				break;
 			}
 
