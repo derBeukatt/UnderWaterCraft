@@ -198,10 +198,8 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	public ItemStack getStackInSlotOnClosing(final int i) {
 		ItemStack item = null;
 
-		if (i < 2) {
-			item = this.getStackInSlot(i);
-			this.setInventorySlotContents(i, null);
-		}
+		item = this.getStackInSlot(i);
+		this.setInventorySlotContents(i, null);
 
 		return item;
 	}

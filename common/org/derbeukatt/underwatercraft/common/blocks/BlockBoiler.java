@@ -7,10 +7,11 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
@@ -74,7 +75,7 @@ public class BlockBoiler extends BlockContainer {
 	public void addCollisionBoxesToList(final World world, final int x,
 			final int y, final int z, final AxisAlignedBB aabb,
 			final List list, final Entity entity) {
-
+		// TODO: normal collision box
 		/* bottom */
 		this.setBlockBounds(0.0F, 0.2F, 0.0F, 1.0F, 0.4F, 1.0F);
 		super.addCollisionBoxesToList(world, x, y, z, aabb, list, entity);
@@ -103,12 +104,48 @@ public class BlockBoiler extends BlockContainer {
 	}
 
 	@Override
+	public void breakBlock(final World world, final int x, final int y,
+			final int z, final int id, final int meta) {
+		final TileEntity te = world.getBlockTileEntity(x, y, z);
+
+		if ((te != null) && (te instanceof IInventory)) {
+			final IInventory inventory = (IInventory) te;
+
+			for (int i = 0; i < inventory.getSizeInventory(); i++) {
+				final ItemStack stack = inventory.getStackInSlotOnClosing(i);
+
+				if (stack != null) {
+					final float spawnX = x + world.rand.nextFloat();
+					final float spawnY = y + world.rand.nextFloat();
+					final float spawnZ = z + world.rand.nextFloat();
+
+					final EntityItem droppedItem = new EntityItem(world,
+							spawnX, spawnY, spawnZ, stack);
+
+					final float mult = 0.05F;
+
+					droppedItem.motionX = (-0.5F + world.rand.nextFloat())
+							* mult;
+					droppedItem.motionY = (4 + world.rand.nextFloat()) * mult;
+					droppedItem.motionZ = (-0.5F + world.rand.nextFloat())
+							* mult;
+
+					world.spawnEntityInWorld(droppedItem);
+				}
+			}
+		}
+
+		super.breakBlock(world, x, y, z, id, meta);
+	}
+
+	@Override
 	public TileEntity createNewTileEntity(final World world) {
 		return new TileEntityBoiler();
 	}
 
 	@Override
 	public int damageDropped(final int meta) {
+		// TODO: do not need this anymore?
 		return meta;
 	}
 
@@ -126,16 +163,6 @@ public class BlockBoiler extends BlockContainer {
 	@Override
 	public int getRenderType() {
 		return BlockInfo.BOILER_RENDER_ID;
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void getSubBlocks(final int id, final CreativeTabs tab,
-			final List list) {
-		list.add(new ItemStack(id, 1, 0));
-		list.add(new ItemStack(id, 1, 1));
-		list.add(new ItemStack(id, 1, 2));
 	}
 
 	@Override
