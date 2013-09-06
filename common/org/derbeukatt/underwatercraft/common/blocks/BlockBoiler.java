@@ -203,7 +203,7 @@ public class BlockBoiler extends BlockContainer {
 				return true;
 			}
 		} else {
-			return false;
+			return true;
 		}
 	}
 
