@@ -107,15 +107,19 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	@Override
 	public FluidStack drain(final ForgeDirection from,
 			final FluidStack resource, final boolean doDrain) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public FluidStack drain(final ForgeDirection from, final int maxDrain,
 			final boolean doDrain) {
-		// TODO Auto-generated method stub
-		return null;
+		final FluidStack amount = this.waterTank.drain(maxDrain, doDrain);
+		if ((amount != null) && doDrain) {
+			this.renderHeight -= amount.amount;
+			this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord,
+					this.zCoord);
+		}
+		return amount;
 	}
 
 	@Override

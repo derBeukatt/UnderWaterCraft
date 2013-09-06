@@ -11,7 +11,6 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
@@ -168,13 +167,13 @@ public class BlockBoiler extends BlockContainer {
 
 					}
 					te.fill(ForgeDirection.getOrientation(side), fluid, true);
-					// world.setBlockMetadataWithNotify(x, y, z, 1, 3);
-
-				} else if (FluidContainerRegistry.isBucket(heldItem)) {
-					if (world.getBlockMetadata(x, y, z) > 0) {
-						final ItemStack fillStack = new ItemStack(
-								Item.bucketWater);
-
+				} else if (FluidContainerRegistry.isContainer(heldItem)) {
+					final FluidStack fillFluid = te.getWaterTank().getFluid();
+					final ItemStack fillStack = FluidContainerRegistry
+							.fillFluidContainer(fillFluid, heldItem);
+					if (fillStack != null) {
+						te.drain(ForgeDirection.UNKNOWN, FluidContainerRegistry
+								.getFluidForFilledItem(fillStack).amount, true);
 						if (!player.capabilities.isCreativeMode) {
 							if (heldItem.stackSize == 1) {
 								player.inventory
@@ -192,14 +191,11 @@ public class BlockBoiler extends BlockContainer {
 								}
 							}
 						}
-
-						world.setBlockMetadataWithNotify(x, y, z, 0, 3);
 					}
 				} else {
 					FMLNetworkHandler.openGui(player, UnderWaterCraft.instance,
 							0, world, x, y, z);
 				}
-
 				return true;
 			} else {
 				FMLNetworkHandler.openGui(player, UnderWaterCraft.instance, 0,
@@ -207,7 +203,7 @@ public class BlockBoiler extends BlockContainer {
 				return true;
 			}
 		} else {
-			return true;
+			return false;
 		}
 	}
 
