@@ -91,7 +91,7 @@ public class RenderBoiler implements ISimpleBlockRenderingHandler {
 		renderStandardInvBlock(renderer, block, metadata);
 
 		/* separator */
-		renderer.setRenderBounds(0.375F, 0.4F, 0.0625F, 0.625F, 1F, 0.9375F);
+		renderer.setRenderBounds(0.4375F, 0.4F, 0.0625F, 0.5625F, 1F, 0.9375F);
 		renderStandardInvBlock(renderer, block, metadata);
 	}
 
