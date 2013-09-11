@@ -15,6 +15,7 @@ import org.derbeukatt.underwatercraft.common.fluids.Fluids;
 import org.derbeukatt.underwatercraft.common.items.Items;
 import org.derbeukatt.underwatercraft.network.PacketHandler;
 import org.derbeukatt.underwatercraft.util.BucketHandler;
+import org.derbeukatt.underwatercraft.util.ClientTickHandler;
 import org.derbeukatt.underwatercraft.util.ConfigHandler;
 
 import cpw.mods.fml.common.FMLLog;
@@ -28,6 +29,7 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -80,6 +82,8 @@ public class UnderWaterCraft {
 		MinecraftForge.EVENT_BUS.register(BucketHandler.INSTANCE);
 
 		MinecraftForge.EVENT_BUS.register(this);
+
+		TickRegistry.registerTickHandler(new ClientTickHandler(), Side.CLIENT);
 	}
 
 	@ForgeSubscribe

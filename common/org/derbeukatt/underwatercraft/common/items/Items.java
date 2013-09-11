@@ -16,7 +16,9 @@ public class Items {
 
 	public static Item itemBlubberBucket;
 	public static Item itemScale;
+	private static ItemScaleBoots itemScaleBoots;
 	public static Item itemScaleHard;
+	private static ItemScaleHat itemScaleHat;
 	public static Item itemScalePlate;
 	public static Item itemScalingKnife;
 	public static Item itemWhetstone;
@@ -46,6 +48,9 @@ public class Items {
 				BlockInfo.BLUBBER_ID).setUnlocalizedName(
 				ItemInfo.BLUBBER_BUCKET_UNLOCALIZED_NAME).setContainerItem(
 				Item.bucketEmpty);
+
+		itemScaleHat = new ItemScaleHat(ItemInfo.SCALE_HAT_ID);
+		itemScaleBoots = new ItemScaleBoots(ItemInfo.SCALE_BOOTS_ID);
 	}
 
 	public static void registerFluidContainers() {

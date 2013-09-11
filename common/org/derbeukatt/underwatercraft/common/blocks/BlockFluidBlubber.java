@@ -2,8 +2,13 @@ package org.derbeukatt.underwatercraft.common.blocks;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.Icon;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraftforge.fluids.BlockFluidClassic;
 
 import org.derbeukatt.underwatercraft.client.gui.UnderWaterCraftTab;
@@ -28,6 +33,24 @@ public class BlockFluidBlubber extends BlockFluidClassic {
 	@SideOnly(Side.CLIENT)
 	public Icon getIcon(final int side, final int meta) {
 		return (side != 0) && (side != 1) ? this.flowIcon : this.stillIcon;
+	}
+
+	@Override
+	public void onEntityCollidedWithBlock(final World world, final int x,
+			final int y, final int z, final Entity entity) {
+		if (!world.isRemote) {
+			if (entity != null) {
+				if (entity instanceof EntityPlayer) {
+					final EntityPlayer player = (EntityPlayer) entity;
+					player.addPotionEffect(new PotionEffect(Potion.confusion
+							.getId(), 100, 1, true));
+					player.addPotionEffect(new PotionEffect(Potion.resistance
+							.getId(), 100, 0, true));
+					player.addPotionEffect(new PotionEffect(Potion.moveSpeed
+							.getId(), 100, 1, true));
+				}
+			}
+		}
 	}
 
 	@Override
