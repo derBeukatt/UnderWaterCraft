@@ -44,27 +44,24 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 
 	@Override
 	public boolean canDrain(final ForgeDirection from, final Fluid fluid) {
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean canExtractItem(final int i, final ItemStack itemstack,
 			final int j) {
-		// TODO Auto-generated method stub
-		return false;
+		return i == 2;
 	}
 
 	@Override
 	public boolean canFill(final ForgeDirection from, final Fluid fluid) {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean canInsertItem(final int i, final ItemStack itemstack,
 			final int j) {
-		// TODO Auto-generated method stub
-		return false;
+		return this.isItemValidForSlot(i, itemstack);
 	}
 
 	private boolean canSmelt() {
@@ -73,7 +70,6 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 				|| !this.isBoiling) {
 			return false;
 		} else {
-			/* TODO: check if there is space in second tank */
 			if ((this.blubberTank.getFluidAmount() + FluidContainerRegistry.BUCKET_VOLUME) <= MAX_CAPACITY) {
 				return true;
 			}
@@ -97,7 +93,7 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 				this.setInventorySlotContents(i, null);
 			} else {
 				itemStack = itemStack.splitStack(count);
-				// this.onInventoryChanged();
+				this.onInventoryChanged();
 			}
 		}
 
@@ -131,7 +127,7 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	@Override
 	public FluidStack drain(final ForgeDirection from, final int maxDrain,
 			final boolean doDrain) {
-		return null;
+		return this.blubberTank.drain(maxDrain, doDrain);
 	}
 
 	@Override
@@ -160,8 +156,12 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 
 	@Override
 	public int[] getAccessibleSlotsFromSide(final int var1) {
-		// TODO Auto-generated method stub
-		return null;
+		final int[] slots = new int[3];
+		slots[0] = 0;
+		slots[1] = 1;
+		slots[2] = 2;
+
+		return slots;
 	}
 
 	public FluidTank getBlubberTank() {
@@ -232,8 +232,12 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 
 	@Override
 	public FluidTankInfo[] getTankInfo(final ForgeDirection from) {
-		// TODO Auto-generated method stub
-		return null;
+		final FluidTankInfo[] info = new FluidTankInfo[2];
+
+		info[0] = this.waterTank.getInfo();
+		info[1] = this.blubberTank.getInfo();
+
+		return info;
 	}
 
 	public FluidTank getWaterTank() {
@@ -285,37 +289,6 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	}
 
 	@Override
-	public void onInventoryChanged() {
-		super.onInventoryChanged();
-
-		final ItemStack destStack = this.getStackInSlot(2);
-		if (destStack == null) {
-			final ItemStack stackInSlot = this.getStackInSlot(1);
-			if ((stackInSlot != null)
-					&& !(this.blubberTank.getFluidAmount() < FluidContainerRegistry.BUCKET_VOLUME)) {
-				final Item item = stackInSlot.getItem();
-				if (item != null) {
-					this.decrStackSize(1, 1);
-
-					final ItemStack filledContainer = FluidContainerRegistry
-							.fillFluidContainer(new FluidStack(Fluids.blubber,
-									FluidContainerRegistry.BUCKET_VOLUME),
-									new ItemStack(item));
-
-					this.blubberTank.setFluid(new FluidStack(Fluids.blubber,
-							this.blubberTank.getFluidAmount()
-									- FluidContainerRegistry.BUCKET_VOLUME));
-
-					this.blubberAmount = (short) this.blubberTank
-							.getFluidAmount();
-
-					this.setInventorySlotContents(2, filledContainer);
-				}
-			}
-		}
-	}
-
-	@Override
 	public void openChest() {
 		// TODO Auto-generated method stub
 
@@ -362,7 +335,7 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 			itemstack.stackSize = this.getInventoryStackLimit();
 		}
 
-		// this.onInventoryChanged();
+		this.onInventoryChanged();
 	}
 
 	@Override
@@ -408,6 +381,38 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 				}
 			} else {
 				this.cookTime = 0;
+			}
+
+			final ItemStack destStack = this.getStackInSlot(2);
+			if (destStack == null) {
+				final ItemStack stackInSlot = this.getStackInSlot(1);
+				if ((stackInSlot != null)
+						&& !(this.blubberTank.getFluidAmount() < FluidContainerRegistry.BUCKET_VOLUME)) {
+					final Item item = stackInSlot.getItem();
+					if (item != null) {
+						this.decrStackSize(1, 1);
+
+						final ItemStack filledContainer = FluidContainerRegistry
+								.fillFluidContainer(new FluidStack(
+										Fluids.blubber,
+										FluidContainerRegistry.BUCKET_VOLUME),
+										new ItemStack(item));
+
+						this.blubberTank
+								.setFluid(new FluidStack(
+										Fluids.blubber,
+										this.blubberTank.getFluidAmount()
+												- FluidContainerRegistry.BUCKET_VOLUME));
+
+						this.blubberAmount = (short) this.blubberTank
+								.getFluidAmount();
+
+						this.setInventorySlotContents(2, filledContainer);
+
+						this.worldObj.markBlockForUpdate(this.xCoord,
+								this.yCoord, this.zCoord);
+					}
+				}
 			}
 		}
 	}
