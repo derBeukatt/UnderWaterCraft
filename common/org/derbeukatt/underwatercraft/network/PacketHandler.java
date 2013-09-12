@@ -53,7 +53,7 @@ public class PacketHandler implements IPacketHandler {
 			entityPlayerMP.motionY = inputMap.motionY;
 			entityPlayerMP.motionZ = inputMap.motionZ;
 
-			entityPlayerMP.velocityChanged = true;
+			// entityPlayerMP.velocityChanged = true;
 
 			// System.out.println("read input map!!!");
 			break;

@@ -1,21 +1,20 @@
-package org.derbeukatt.underwatercraft.common.items;
+package org.derbeukatt.underwatercraft.common.items.armor;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import net.minecraftforge.common.EnumHelper;
 
 import org.derbeukatt.underwatercraft.client.gui.UnderWaterCraftTab;
+import org.derbeukatt.underwatercraft.common.items.ItemInfo;
 import org.derbeukatt.underwatercraft.util.PlayerInputMap;
 
-public class ItemScaleBoots extends ItemArmor {
+public class ItemScaleBoots extends ItemScaleArmor {
 
 	public ItemScaleBoots(final int id) {
-		super(id, EnumHelper.addArmorMaterial("SCALEHAT", 10, new int[] { 2, 5,
-				3, 1 }, 25), 0, 3);
+		super(id, 3);
+		this.setUnlocalizedName(ItemInfo.SCALE_BOOTS_UNLOCALIZED_NAME);
 		this.setCreativeTab(UnderWaterCraftTab.tabUnderWaterCraft);
 	}
 

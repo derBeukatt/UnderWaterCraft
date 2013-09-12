@@ -8,17 +8,21 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.oredict.OreDictionary;
 
 import org.derbeukatt.underwatercraft.common.blocks.BlockInfo;
+import org.derbeukatt.underwatercraft.common.items.armor.ItemScaleBoots;
+import org.derbeukatt.underwatercraft.common.items.armor.ItemScaleHat;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
 public class Items {
 
+	public static Item itemBlubberBottle;
 	public static Item itemBlubberBucket;
+	public static Item itemRainbowBlubberBottle;
 	public static Item itemScale;
-	private static ItemScaleBoots itemScaleBoots;
+	public static Item itemScaleBoots;
 	public static Item itemScaleHard;
-	private static ItemScaleHat itemScaleHat;
+	public static Item itemScaleHat;
 	public static Item itemScalePlate;
 	public static Item itemScalingKnife;
 	public static Item itemWhetstone;
@@ -31,6 +35,12 @@ public class Items {
 		LanguageRegistry.addName(itemScalingKnife, ItemInfo.SCALING_KNIFE_NAME);
 		LanguageRegistry.addName(itemBlubberBucket,
 				ItemInfo.BLUBBER_BUCKET_NAME);
+		LanguageRegistry.addName(itemScaleHat, ItemInfo.SCALE_HAT_NAME);
+		LanguageRegistry.addName(itemScaleBoots, ItemInfo.SCALE_BOOTS_NAME);
+		LanguageRegistry.addName(itemBlubberBottle,
+				ItemInfo.BLUBBER_BOTTLE_NAME);
+		LanguageRegistry.addName(itemRainbowBlubberBottle,
+				ItemInfo.RAINBOW_BLUBBER_BOTTLE_NAME);
 	}
 
 	public static void init() {
@@ -51,6 +61,9 @@ public class Items {
 
 		itemScaleHat = new ItemScaleHat(ItemInfo.SCALE_HAT_ID);
 		itemScaleBoots = new ItemScaleBoots(ItemInfo.SCALE_BOOTS_ID);
+		itemBlubberBottle = new ItemBlubberBottle(ItemInfo.BLUBBER_BOTTLE_ID);
+		itemRainbowBlubberBottle = new ItemRainbowBlubberBottle(
+				ItemInfo.RAINBOW_BLUBBER_BOTTLE_ID);
 	}
 
 	public static void registerFluidContainers() {
