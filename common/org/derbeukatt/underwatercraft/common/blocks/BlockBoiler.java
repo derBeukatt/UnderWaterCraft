@@ -195,12 +195,17 @@ public class BlockBoiler extends BlockContainer {
 					}
 					te.fill(ForgeDirection.getOrientation(side), fluid, true);
 				} else if (FluidContainerRegistry.isContainer(heldItem)) {
-					final FluidStack fillFluid = te.getWaterTank().getFluid();
+					FluidStack fillFluid = null;
+					if (te.getBlubberTank().getFluidAmount() >= FluidContainerRegistry.BUCKET_VOLUME) {
+						fillFluid = te.getBlubberTank().getFluid();
+					} else {
+						fillFluid = te.getWaterTank().getFluid();
+					}
 					final ItemStack fillStack = FluidContainerRegistry
 							.fillFluidContainer(fillFluid, heldItem);
 					if (fillStack != null) {
 						te.drain(ForgeDirection.UNKNOWN, FluidContainerRegistry
-								.getFluidForFilledItem(fillStack).amount, true);
+								.getFluidForFilledItem(fillStack), true);
 						if (!player.capabilities.isCreativeMode) {
 							if (heldItem.stackSize == 1) {
 								player.inventory

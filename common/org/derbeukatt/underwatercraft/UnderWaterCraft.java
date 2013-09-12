@@ -19,7 +19,6 @@ import org.derbeukatt.underwatercraft.common.blocks.Blocks;
 import org.derbeukatt.underwatercraft.common.fluids.Fluids;
 import org.derbeukatt.underwatercraft.common.items.Items;
 import org.derbeukatt.underwatercraft.network.PacketHandler;
-import org.derbeukatt.underwatercraft.util.BucketHandler;
 import org.derbeukatt.underwatercraft.util.ClientTickHandler;
 import org.derbeukatt.underwatercraft.util.ConfigHandler;
 
@@ -112,11 +111,6 @@ public class UnderWaterCraft {
 		Items.init();
 		GameRegistry.registerCraftingHandler(new CraftingHandler());
 		proxy.initRenderers();
-
-		BucketHandler.INSTANCE.buckets.put(Blocks.blubber,
-				Items.itemBlubberBucket);
-
-		MinecraftForge.EVENT_BUS.register(BucketHandler.INSTANCE);
 
 		MinecraftForge.EVENT_BUS.register(this);
 

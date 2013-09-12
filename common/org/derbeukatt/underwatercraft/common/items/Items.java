@@ -37,10 +37,6 @@ public class Items {
 				ItemInfo.BLUBBER_BUCKET_NAME);
 		LanguageRegistry.addName(itemScaleHat, ItemInfo.SCALE_HAT_NAME);
 		LanguageRegistry.addName(itemScaleBoots, ItemInfo.SCALE_BOOTS_NAME);
-		LanguageRegistry.addName(itemBlubberBottle,
-				ItemInfo.BLUBBER_BOTTLE_NAME);
-		LanguageRegistry.addName(itemRainbowBlubberBottle,
-				ItemInfo.RAINBOW_BLUBBER_BOTTLE_NAME);
 	}
 
 	public static void init() {
@@ -61,9 +57,6 @@ public class Items {
 
 		itemScaleHat = new ItemScaleHat(ItemInfo.SCALE_HAT_ID);
 		itemScaleBoots = new ItemScaleBoots(ItemInfo.SCALE_BOOTS_ID);
-		itemBlubberBottle = new ItemBlubberBottle(ItemInfo.BLUBBER_BOTTLE_ID);
-		itemRainbowBlubberBottle = new ItemRainbowBlubberBottle(
-				ItemInfo.RAINBOW_BLUBBER_BOTTLE_ID);
 	}
 
 	public static void registerFluidContainers() {

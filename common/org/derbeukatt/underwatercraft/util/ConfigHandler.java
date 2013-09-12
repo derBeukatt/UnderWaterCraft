@@ -37,11 +37,6 @@ public class ConfigHandler {
 				ItemInfo.SCALE_HAT_DEFAULT);
 		ItemInfo.SCALE_BOOTS_ID = getItemFromConfig(ItemInfo.SCALE_BOOTS_KEY,
 				ItemInfo.SCALE_BOOTS_DEFAULT);
-		ItemInfo.BLUBBER_BOTTLE_ID = getItemFromConfig(
-				ItemInfo.BLUBBER_BOTTLE_KEY, ItemInfo.BLUBBER_BOTTLE_DEFAULT);
-		ItemInfo.RAINBOW_BLUBBER_BOTTLE_ID = getItemFromConfig(
-				ItemInfo.RAINBOW_BLUBBER_BOTTLE_KEY,
-				ItemInfo.RAINBOW_BLUBBER_BOTTLE_DEFAULT);
 
 		BlockInfo.BOILER_ID = configuration.getBlock(BlockInfo.BOILER_KEY,
 				BlockInfo.BOILER_DEFAULT).getInt();

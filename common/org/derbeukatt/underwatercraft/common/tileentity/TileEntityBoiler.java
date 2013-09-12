@@ -107,27 +107,53 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	@Override
 	public FluidStack drain(final ForgeDirection from,
 			final FluidStack resource, final boolean doDrain) {
-		return null;
+
+		FluidTank tankToDrain = null;
+		FluidStack amount = null;
+
+		if (resource.getFluid().getID() == Fluids.blubber.getID()) {
+			tankToDrain = this.blubberTank;
+		} else if (resource.getFluid().getID() == FluidRegistry.WATER.getID()) {
+			tankToDrain = this.waterTank;
+		}
+
+		if (tankToDrain != null) {
+			amount = tankToDrain.drain(resource.amount, doDrain);
+			this.renderHeight = this.waterTank.getFluidAmount();
+			this.blubberAmount = (short) this.blubberTank.getFluidAmount();
+			this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord,
+					this.zCoord);
+		}
+
+		return amount;
 	}
 
 	@Override
 	public FluidStack drain(final ForgeDirection from, final int maxDrain,
 			final boolean doDrain) {
-		final FluidStack amount = this.waterTank.drain(maxDrain, doDrain);
-		if ((amount != null) && doDrain) {
-			this.renderHeight -= amount.amount;
-			this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord,
-					this.zCoord);
-		}
-		return amount;
+		return null;
 	}
 
 	@Override
 	public int fill(final ForgeDirection from, final FluidStack resource,
 			final boolean doFill) {
-		final int amount = this.waterTank.fill(resource, doFill);
-		this.renderHeight = this.waterTank.getFluidAmount();
-		this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
+
+		FluidTank tankToFill = null;
+		int amount = 0;
+
+		if (resource.getFluid().getID() == Fluids.blubber.getID()) {
+			tankToFill = this.blubberTank;
+		} else if (resource.getFluid().getID() == FluidRegistry.WATER.getID()) {
+			tankToFill = this.waterTank;
+		}
+
+		if (tankToFill != null) {
+			amount = tankToFill.fill(resource, doFill);
+			this.renderHeight = this.waterTank.getFluidAmount();
+			this.blubberAmount = (short) this.blubberTank.getFluidAmount();
+			this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord,
+					this.zCoord);
+		}
 
 		return amount;
 	}

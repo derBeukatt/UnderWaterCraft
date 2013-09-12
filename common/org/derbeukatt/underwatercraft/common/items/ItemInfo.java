@@ -2,14 +2,6 @@ package org.derbeukatt.underwatercraft.common.items;
 
 public class ItemInfo {
 
-	public static final int BLUBBER_BOTTLE_DEFAULT = 24209;
-
-	public static int BLUBBER_BOTTLE_ID;
-	public static final String BLUBBER_BOTTLE_KEY = "blubberbottle";
-	public static final String BLUBBER_BOTTLE_NAME = "Bottle of Blubber";
-
-	public static final String BLUBBER_BOTTLE_UNLOCALIZED_NAME = "blubberbottle";
-
 	public static final int BLUBBER_BUCKET_DEFAULT = 24206;
 
 	public static int BLUBBER_BUCKET_ID;
@@ -28,13 +20,6 @@ public class ItemInfo {
 
 	public static final String HARD_SCALE_UNLOCALIZED_NAME = "scaleHard";
 
-	public static final int RAINBOW_BLUBBER_BOTTLE_DEFAULT = 24210;
-	public static int RAINBOW_BLUBBER_BOTTLE_ID;
-
-	public static final String RAINBOW_BLUBBER_BOTTLE_KEY = "rainbowblubberbottle";
-
-	public static final String RAINBOW_BLUBBER_BOTTLE_NAME = "Bottle of Rainbow Blubber";
-	public static final String RAINBOW_BLUBBER_BOTTLE_UNLOCALIZED_NAME = "rainbowblubberbottle";
 	public static final int SCALE_BOOTS_DEFAULT = 24208;
 
 	public static int SCALE_BOOTS_ID;
