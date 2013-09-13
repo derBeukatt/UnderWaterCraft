@@ -30,9 +30,10 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	private final FluidTank blubberTank;
 
 	public int cookTime;
+	public int heatUpTime;
 	private boolean isBoiling;
-	private final ItemStack[] items;
 
+	private final ItemStack[] items;
 	public int renderHeight;
 	private final FluidTank waterTank;
 
@@ -186,6 +187,10 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 				this.zCoord, 1, tag);
 	}
 
+	public int getHeatupProgressScaled(final int i) {
+		return (this.heatUpTime * i) / 1000;
+	}
+
 	public FluidStack getInputFluid() {
 		return this.waterTank.getFluid();
 	}
@@ -328,6 +333,7 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 		this.blubberAmount = compound.getShort("blubberAmount");
 
 		this.cookTime = compound.getInteger("cooktime");
+		this.heatUpTime = compound.getInteger("heatUpTime");
 	}
 
 	@Override
@@ -360,12 +366,13 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 			} else {
 				if (this.isBoiling) {
 					this.isBoiling = false;
+					this.heatUpTime = 0;
 					this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord,
 							this.zCoord);
 				}
 			}
 
-			if (this.canSmelt()) {
+			if (this.canSmelt() && (this.heatUpTime == 1000)) {
 				++this.cookTime;
 
 				if (this.cookTime == 200) {
@@ -384,6 +391,9 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 							this.zCoord);
 				}
 			} else {
+				if (this.heatUpTime < 1000) {
+					++this.heatUpTime;
+				}
 				this.cookTime = 0;
 			}
 
@@ -455,5 +465,6 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 		compound.setShort("blubberAmount", this.blubberAmount);
 
 		compound.setInteger("cooktime", this.cookTime);
+		compound.setInteger("heatUpTime", this.heatUpTime);
 	}
 }

@@ -88,8 +88,11 @@ public class GuiBoiler extends GuiContainer {
 
 		/* Draw boiling animation */
 		if (this.boiler.isBoiling()) {
-			this.drawTexturedModalRect(this.guiLeft + 53, this.guiTop + 60,
-					176, 0, 14, 14);
+			final int heatupProgressScaled = this.boiler
+					.getHeatupProgressScaled(14);
+			this.drawTexturedModalRect(this.guiLeft + 53,
+					(this.guiTop + 60 + 14) - heatupProgressScaled, 176,
+					14 - heatupProgressScaled, 14, heatupProgressScaled);
 		}
 
 		/* Display water */
