@@ -4,9 +4,9 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-public class SlotBoilerOutput extends Slot {
+public class SlotFluidOutput extends Slot {
 
-	public SlotBoilerOutput(final IInventory inventory, final int id,
+	public SlotFluidOutput(final IInventory inventory, final int id,
 			final int x, final int y) {
 		super(inventory, id, x, y);
 	}

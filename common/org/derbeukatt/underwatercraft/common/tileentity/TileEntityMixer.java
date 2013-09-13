@@ -1,9 +1,7 @@
 package org.derbeukatt.underwatercraft.common.tileentity;
 
-import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -20,25 +18,18 @@ import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
-import org.derbeukatt.underwatercraft.common.fluids.Fluids;
-
-public class TileEntityBoiler extends TileEntity implements IFluidHandler,
+public class TileEntityMixer extends TileEntity implements IFluidHandler,
 		ISidedInventory {
 
 	private static final int MAX_CAPACITY = 16 * FluidContainerRegistry.BUCKET_VOLUME;
-	public short blubberAmount;
-	private final FluidTank blubberTank;
 
-	public int cookTime;
-	private boolean isBoiling;
 	private final ItemStack[] items;
 
 	public int renderHeight;
 	private final FluidTank waterTank;
 
-	public TileEntityBoiler() {
-		this.items = new ItemStack[3];
-		this.blubberTank = new FluidTank(Fluids.blubber, 0, MAX_CAPACITY);
+	public TileEntityMixer() {
+		this.items = new ItemStack[2];
 		this.waterTank = new FluidTank(FluidRegistry.WATER, 0, MAX_CAPACITY);
 	}
 
@@ -50,7 +41,7 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	@Override
 	public boolean canExtractItem(final int i, final ItemStack itemstack,
 			final int j) {
-		return i == 2;
+		return i == 1;
 	}
 
 	@Override
@@ -62,20 +53,6 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	public boolean canInsertItem(final int i, final ItemStack itemstack,
 			final int j) {
 		return this.isItemValidForSlot(i, itemstack);
-	}
-
-	private boolean canSmelt() {
-		if ((this.getStackInSlot(0) == null)
-				|| (this.getWaterTank().getFluidAmount() < FluidContainerRegistry.BUCKET_VOLUME)
-				|| !this.isBoiling) {
-			return false;
-		} else {
-			if ((this.blubberTank.getFluidAmount() + FluidContainerRegistry.BUCKET_VOLUME) <= MAX_CAPACITY) {
-				return true;
-			}
-
-			return false;
-		}
 	}
 
 	@Override
@@ -104,22 +81,10 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	public FluidStack drain(final ForgeDirection from,
 			final FluidStack resource, final boolean doDrain) {
 
-		FluidTank tankToDrain = null;
-		FluidStack amount = null;
-
-		if (resource.getFluid().getID() == Fluids.blubber.getID()) {
-			tankToDrain = this.blubberTank;
-		} else if (resource.getFluid().getID() == FluidRegistry.WATER.getID()) {
-			tankToDrain = this.waterTank;
-		}
-
-		if (tankToDrain != null) {
-			amount = tankToDrain.drain(resource.amount, doDrain);
-			this.renderHeight = this.waterTank.getFluidAmount();
-			this.blubberAmount = (short) this.blubberTank.getFluidAmount();
-			this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord,
-					this.zCoord);
-		}
+		final FluidStack amount = this.waterTank
+				.drain(resource.amount, doDrain);
+		this.renderHeight = this.waterTank.getFluidAmount();
+		this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
 
 		return amount;
 	}
@@ -127,8 +92,8 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	@Override
 	public FluidStack drain(final ForgeDirection from, final int maxDrain,
 			final boolean doDrain) {
-		final FluidStack amount = this.blubberTank.drain(maxDrain, doDrain);
-		this.blubberAmount = (short) this.blubberTank.getFluidAmount();
+		final FluidStack amount = this.waterTank.drain(maxDrain, doDrain);
+		this.renderHeight = this.waterTank.getFluidAmount();
 		this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
 
 		return amount;
@@ -138,50 +103,26 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	public int fill(final ForgeDirection from, final FluidStack resource,
 			final boolean doFill) {
 
-		FluidTank tankToFill = null;
-		int amount = 0;
-
-		if (resource.getFluid().getID() == Fluids.blubber.getID()) {
-			tankToFill = this.blubberTank;
-		} else if (resource.getFluid().getID() == FluidRegistry.WATER.getID()) {
-			tankToFill = this.waterTank;
-		}
-
-		if (tankToFill != null) {
-			amount = tankToFill.fill(resource, doFill);
-			this.renderHeight = this.waterTank.getFluidAmount();
-			this.blubberAmount = (short) this.blubberTank.getFluidAmount();
-			this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord,
-					this.zCoord);
-		}
+		final int amount = this.waterTank.fill(resource, doFill);
+		this.renderHeight = this.waterTank.getFluidAmount();
+		this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
 
 		return amount;
 	}
 
 	@Override
 	public int[] getAccessibleSlotsFromSide(final int var1) {
-		final int[] slots = new int[3];
+		final int[] slots = new int[2];
 		slots[0] = 0;
 		slots[1] = 1;
-		slots[2] = 2;
 
 		return slots;
-	}
-
-	public FluidTank getBlubberTank() {
-		return this.blubberTank;
-	}
-
-	public int getCookProgressScaled(final int i) {
-		return (this.cookTime * i) / 200;
 	}
 
 	@Override
 	public Packet getDescriptionPacket() {
 		final NBTTagCompound tag = new NBTTagCompound();
 		tag.setInteger("renderHeight", this.renderHeight);
-		tag.setInteger("blubberAmount", this.blubberAmount);
-		tag.setBoolean("isBoiling", this.isBoiling);
 		return new Packet132TileEntityData(this.xCoord, this.yCoord,
 				this.zCoord, 1, tag);
 	}
@@ -197,16 +138,7 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 
 	@Override
 	public String getInvName() {
-		return "InventoryBoiler";
-	}
-
-	public FluidStack getOutputFluid() {
-		return this.blubberTank.getFluid();
-	}
-
-	public int getScaledBlubberAmount(final int i) {
-		return this.blubberAmount != 0 ? (int) (((float) this.blubberAmount / (float) (MAX_CAPACITY)) * i)
-				: 0;
+		return "InventoryMixer";
 	}
 
 	public int getScaledWaterAmount(final int i) {
@@ -239,17 +171,12 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 		final FluidTankInfo[] info = new FluidTankInfo[2];
 
 		info[0] = this.waterTank.getInfo();
-		info[1] = this.blubberTank.getInfo();
 
 		return info;
 	}
 
 	public FluidTank getWaterTank() {
 		return this.waterTank;
-	}
-
-	public boolean isBoiling() {
-		return this.isBoiling;
 	}
 
 	@Override
@@ -260,8 +187,6 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	@Override
 	public boolean isItemValidForSlot(final int i, final ItemStack itemstack) {
 		if (i == 0) {
-			return itemstack.itemID == Item.fishRaw.itemID;
-		} else if (i == 1) {
 			return FluidContainerRegistry.isEmptyContainer(itemstack);
 		} else {
 			return false;
@@ -280,14 +205,9 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 		final NBTTagCompound tag = packet.customParam1;
 
 		this.renderHeight = tag.getInteger("renderHeight");
-		this.blubberAmount = (short) tag.getInteger("blubberAmount");
 
 		this.waterTank.setFluid(new FluidStack(FluidRegistry.WATER,
 				this.renderHeight));
-		this.blubberTank.setFluid(new FluidStack(Fluids.blubber,
-				this.blubberAmount));
-
-		this.isBoiling = tag.getBoolean("isBoiling");
 		this.worldObj.markBlockForRenderUpdate(this.xCoord, this.yCoord,
 				this.zCoord);
 	}
@@ -319,15 +239,7 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 
 		this.waterTank.setFluid(new FluidStack(idWater, amountWater));
 
-		final int idBlubber = compound.getInteger("itemIDBlubber");
-		final int amountBlubber = compound.getInteger("amountBlubber");
-
-		this.blubberTank.setFluid(new FluidStack(idBlubber, amountBlubber));
-
 		this.renderHeight = compound.getShort("renderHeight");
-		this.blubberAmount = compound.getShort("blubberAmount");
-
-		this.cookTime = compound.getInteger("cooktime");
 	}
 
 	@Override
@@ -345,79 +257,6 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	@Override
 	public void updateEntity() {
 		if (!this.worldObj.isRemote) {
-			final int blockId = this.worldObj.getBlockId(this.xCoord,
-					this.yCoord - 1, this.zCoord);
-
-			if ((blockId == Block.fire.blockID)
-					|| (blockId == Block.lavaMoving.blockID)
-					|| (blockId == Block.lavaStill.blockID)) {
-
-				if (!this.isBoiling) {
-					this.isBoiling = true;
-					this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord,
-							this.zCoord);
-				}
-			} else {
-				if (this.isBoiling) {
-					this.isBoiling = false;
-					this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord,
-							this.zCoord);
-				}
-			}
-
-			if (this.canSmelt()) {
-				++this.cookTime;
-
-				if (this.cookTime == 200) {
-					this.cookTime = 0;
-					this.decrStackSize(0, 1);
-					this.waterTank.setFluid(new FluidStack(FluidRegistry.WATER,
-							this.waterTank.getFluidAmount()
-									- FluidContainerRegistry.BUCKET_VOLUME));
-					this.renderHeight = this.waterTank.getFluidAmount();
-					this.blubberTank.fill(new FluidStack(Fluids.blubber,
-							FluidContainerRegistry.BUCKET_VOLUME), true);
-					this.blubberAmount = (short) this.blubberTank
-							.getFluidAmount();
-
-					this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord,
-							this.zCoord);
-				}
-			} else {
-				this.cookTime = 0;
-			}
-
-			final ItemStack destStack = this.getStackInSlot(2);
-			if (destStack == null) {
-				final ItemStack stackInSlot = this.getStackInSlot(1);
-				if ((stackInSlot != null)
-						&& !(this.blubberTank.getFluidAmount() < FluidContainerRegistry.BUCKET_VOLUME)) {
-					final Item item = stackInSlot.getItem();
-					if (item != null) {
-						this.decrStackSize(1, 1);
-
-						final ItemStack filledContainer = FluidContainerRegistry
-								.fillFluidContainer(new FluidStack(
-										Fluids.blubber,
-										FluidContainerRegistry.BUCKET_VOLUME),
-										new ItemStack(item));
-
-						this.blubberTank
-								.setFluid(new FluidStack(
-										Fluids.blubber,
-										this.blubberTank.getFluidAmount()
-												- FluidContainerRegistry.BUCKET_VOLUME));
-
-						this.blubberAmount = (short) this.blubberTank
-								.getFluidAmount();
-
-						this.setInventorySlotContents(2, filledContainer);
-
-						this.worldObj.markBlockForUpdate(this.xCoord,
-								this.yCoord, this.zCoord);
-					}
-				}
-			}
 		}
 	}
 
@@ -439,21 +278,12 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 
 		compound.setTag("Items", items);
 
-		FluidStack liquid = this.waterTank.getFluid();
+		final FluidStack liquid = this.waterTank.getFluid();
 		if (liquid != null) {
 			compound.setInteger("itemIDWater", liquid.fluidID);
 			compound.setInteger("amountWater", liquid.amount);
 		}
 
-		liquid = this.blubberTank.getFluid();
-		if (liquid != null) {
-			compound.setInteger("itemIDBlubber", liquid.fluidID);
-			compound.setInteger("amountBlubber", liquid.amount);
-		}
-
 		compound.setShort("renderHeight", (short) this.renderHeight);
-		compound.setShort("blubberAmount", this.blubberAmount);
-
-		compound.setInteger("cooktime", this.cookTime);
 	}
 }

@@ -33,6 +33,18 @@ public class BlockInfo {
 
 	public static final String BOILER_UNLOCALIZED_NAME = "boiler";
 
+	public static final int MIXER_DEFAULT = 2077;
+	public static int MIXER_ID;
+
+	public static final String MIXER_KEY = "mixer";
+
+	public static final String MIXER_NAME = "Blubber Mixer";
+
+	public static int MIXER_RENDER_ID;
+
+	public static final String MIXER_TE_KEY = "mixerTileEntity";
+
+	public static final String MIXER_UNLOCALIZED_NAME = "mixer";
 	public static final String TEXTURE_LOCATION = "underwatercraft";
 
 }
