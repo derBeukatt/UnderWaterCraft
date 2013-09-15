@@ -6,6 +6,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.Icon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
 import org.derbeukatt.underwatercraft.common.containers.ContainerMixer;
@@ -82,7 +83,7 @@ public class GuiMixer extends GuiContainer {
 		GL11.glColor4f(1F, 1F, 1F, 1F);
 		this.mc.renderEngine.func_110577_a(TEXTURE);
 
-		/* Dray main gui */
+		/* Draw main gui */
 		this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize,
 				this.ySize);
 
@@ -95,6 +96,18 @@ public class GuiMixer extends GuiContainer {
 		/* Display water */
 		this.displayGauge(19, 8, this.mixer.getScaledWaterAmount(58),
 				this.mixer.getInputFluid());
+
+		/* here display bottle of water */
+		this.mc.renderEngine.func_110577_a(BLOCK_TEXTURE);
+		this.drawTexturedModelRectFromIcon(this.guiLeft + 72, this.guiTop + 51,
+				FluidRegistry.WATER.getStillIcon(), 32, 22);
+		this.drawTexturedModelRectFromIcon(this.guiLeft + 76, this.guiTop + 46,
+				FluidRegistry.WATER.getStillIcon(), 24, 5);
+
+		/* here display bottle */
+		this.mc.renderEngine.func_110577_a(TEXTURE);
+		this.drawTexturedModalRect(this.guiLeft + 58, this.guiTop + 18, 176,
+				58, 60, 60);
 
 		// /* Display blubber */
 		// this.displayGauge(19, 131, this.mixer.getScaledBlubberAmount(58),
