@@ -5,10 +5,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
+import net.minecraft.tileentity.TileEntity;
 
 import org.derbeukatt.underwatercraft.ModInfo;
+import org.derbeukatt.underwatercraft.common.tileentity.TileEntityMixer;
 import org.derbeukatt.underwatercraft.util.PlayerInputMap;
 
 import com.google.common.io.ByteArrayDataInput;
@@ -19,6 +23,26 @@ import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
 
 public class PacketHandler implements IPacketHandler {
+
+	public static void sendAddedDye(final ItemStack dye, final int xCoord,
+			final int yCoord, final int zCoord) {
+		final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+		final DataOutputStream dataStream = new DataOutputStream(byteStream);
+
+		try {
+			dataStream.writeByte((byte) 1);
+			dataStream.writeInt(xCoord);
+			dataStream.writeInt(yCoord);
+			dataStream.writeInt(zCoord);
+			dataStream.writeInt(dye.getItemDamage());
+
+			PacketDispatcher.sendPacketToServer(PacketDispatcher.getPacket(
+					ModInfo.MOD_CHANNELS, byteStream.toByteArray()));
+
+		} catch (final IOException ex) {
+			System.err.append("Failed to send dyes!");
+		}
+	}
 
 	public static void sendInputMap(final PlayerInputMap inputmap) {
 		final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
@@ -56,6 +80,24 @@ public class PacketHandler implements IPacketHandler {
 			// entityPlayerMP.velocityChanged = true;
 
 			// System.out.println("read input map!!!");
+			break;
+		case 1:
+			final int xCoord = reader.readInt();
+			final int yCoord = reader.readInt();
+			final int zCoord = reader.readInt();
+			final TileEntity blockTileEntity = entityPlayerMP.worldObj
+					.getBlockTileEntity(xCoord, yCoord, zCoord);
+			if (blockTileEntity != null) {
+				if (blockTileEntity instanceof TileEntityMixer) {
+					final TileEntityMixer te = (TileEntityMixer) blockTileEntity;
+					final int dmg = reader.readInt();
+					final ItemStack itemStack = new ItemStack(Item.dyePowder,
+							1, dmg);
+					if (!te.dyes.contains(itemStack)) {
+						te.dyes.add(itemStack);
+					}
+				}
+			}
 			break;
 		default:
 			break;

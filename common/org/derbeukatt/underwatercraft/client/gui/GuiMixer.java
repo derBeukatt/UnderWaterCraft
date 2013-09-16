@@ -3,14 +3,16 @@ package org.derbeukatt.underwatercraft.client.gui;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
 import org.derbeukatt.underwatercraft.common.containers.ContainerMixer;
 import org.derbeukatt.underwatercraft.common.tileentity.TileEntityMixer;
+import org.derbeukatt.underwatercraft.network.PacketHandler;
 import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.relauncher.Side;
@@ -19,10 +21,17 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class GuiMixer extends GuiContainer {
 
-	private static final ResourceLocation BLOCK_TEXTURE = TextureMap.field_110575_b;
+	protected static final ResourceLocation BLOCK_TEXTURE = TextureMap.field_110575_b;
 
-	private static final ResourceLocation TEXTURE = new ResourceLocation(
+	private static final GuiBottle BOTTLE;
+
+	protected static final ResourceLocation TEXTURE = new ResourceLocation(
 			"underwatercraft", "textures/gui/mixer_gui.png");
+	static {
+		BOTTLE = new GuiBottle(67, 18, 42, 60);
+	}
+
+	private final InventoryPlayer inventory;
 
 	private final TileEntityMixer mixer;
 
@@ -30,6 +39,7 @@ public class GuiMixer extends GuiContainer {
 		super(new ContainerMixer(inventory, te));
 
 		this.mixer = te;
+		this.inventory = inventory;
 
 		this.xSize = 176;
 		this.ySize = 166;
@@ -97,17 +107,7 @@ public class GuiMixer extends GuiContainer {
 		this.displayGauge(19, 8, this.mixer.getScaledWaterAmount(58),
 				this.mixer.getInputFluid());
 
-		/* here display bottle of water */
-		this.mc.renderEngine.func_110577_a(BLOCK_TEXTURE);
-		this.drawTexturedModelRectFromIcon(this.guiLeft + 72, this.guiTop + 51,
-				FluidRegistry.WATER.getStillIcon(), 32, 22);
-		this.drawTexturedModelRectFromIcon(this.guiLeft + 76, this.guiTop + 46,
-				FluidRegistry.WATER.getStillIcon(), 24, 5);
-
-		/* here display bottle */
-		this.mc.renderEngine.func_110577_a(TEXTURE);
-		this.drawTexturedModalRect(this.guiLeft + 58, this.guiTop + 18, 176,
-				58, 60, 60);
+		GuiMixer.BOTTLE.draw(this, this.mc.renderEngine, 176, 58);
 
 		// /* Display blubber */
 		// this.displayGauge(19, 131, this.mixer.getScaledBlubberAmount(58),
@@ -123,4 +123,41 @@ public class GuiMixer extends GuiContainer {
 		this.fontRenderer.drawString("Mixer", 8, 6, 0x404040);
 	}
 
+	public int getLeft() {
+		return this.guiLeft;
+	}
+
+	public TileEntityMixer getMixer() {
+		return this.mixer;
+	}
+
+	public int getTop() {
+		return this.guiTop;
+	}
+
+	@Override
+	protected void mouseClicked(final int x, final int y, final int button) {
+		super.mouseClicked(x, y, button);
+		if (button == 1) {
+			if (GuiMixer.BOTTLE.mouseClicked(this, x, y)) {
+				final ItemStack itemStack = this.inventory.getItemStack();
+				if (itemStack != null) {
+					if (itemStack.itemID == Item.dyePowder.itemID) {
+						if (!this.mixer.dyes.contains(itemStack)) {
+							this.mixer.dyes.add(itemStack);
+							PacketHandler.sendAddedDye(itemStack,
+									this.mixer.xCoord, this.mixer.yCoord,
+									this.mixer.zCoord);
+						}
+					}
+				}
+			}
+		} else if (button == 0) {
+			if (this.mixer.dyes.size() == 16) {
+				if (GuiMixer.BOTTLE.mouseClicked(this, x, y)) {
+					System.out.println("would do stuff here");
+				}
+			}
+		}
+	}
 }

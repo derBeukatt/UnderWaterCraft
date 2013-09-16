@@ -1,5 +1,7 @@
 package org.derbeukatt.underwatercraft.common.tileentity;
 
+import java.util.ArrayList;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -23,13 +25,16 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 
 	private static final int MAX_CAPACITY = 16 * FluidContainerRegistry.BUCKET_VOLUME;
 
-	private final ItemStack[] items;
+	public ArrayList<ItemStack> dyes;
 
+	private final ItemStack[] items;
 	public int renderHeight;
+
 	private final FluidTank waterTank;
 
 	public TileEntityMixer() {
 		this.items = new ItemStack[2];
+		this.dyes = new ArrayList<ItemStack>();
 		this.waterTank = new FluidTank(FluidRegistry.WATER, 0, MAX_CAPACITY);
 	}
 
@@ -123,6 +128,20 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 	public Packet getDescriptionPacket() {
 		final NBTTagCompound tag = new NBTTagCompound();
 		tag.setInteger("renderHeight", this.renderHeight);
+		final NBTTagList dyes = new NBTTagList();
+
+		for (int i = 0; i < this.dyes.size(); i++) {
+			final ItemStack stack = this.dyes.get(i);
+
+			if (stack != null) {
+				final NBTTagCompound dye = new NBTTagCompound();
+				dye.setByte("Dye", (byte) i);
+				stack.writeToNBT(dye);
+				dyes.appendTag(dye);
+			}
+		}
+
+		tag.setTag("Dyes", dyes);
 		return new Packet132TileEntityData(this.xCoord, this.yCoord,
 				this.zCoord, 1, tag);
 	}
@@ -208,6 +227,18 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 
 		this.waterTank.setFluid(new FluidStack(FluidRegistry.WATER,
 				this.renderHeight));
+
+		final NBTTagList dyes = tag.getTagList("Dyes");
+
+		for (int i = 0; i < dyes.tagCount(); i++) {
+			final NBTTagCompound dye = (NBTTagCompound) dyes.tagAt(i);
+			final int index = dye.getByte("Dye");
+
+			if ((index >= 0) && (index < 16)) {
+				this.dyes.add(index, ItemStack.loadItemStackFromNBT(dye));
+			}
+		}
+
 		this.worldObj.markBlockForRenderUpdate(this.xCoord, this.yCoord,
 				this.zCoord);
 	}
@@ -231,6 +262,17 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 			if ((slot >= 0) && (slot < this.getSizeInventory())) {
 				this.setInventorySlotContents(slot,
 						ItemStack.loadItemStackFromNBT(item));
+			}
+		}
+
+		final NBTTagList dyes = compound.getTagList("Dyes");
+
+		for (int i = 0; i < dyes.tagCount(); i++) {
+			final NBTTagCompound dye = (NBTTagCompound) dyes.tagAt(i);
+			final int index = dye.getByte("Dye");
+
+			if ((index >= 0) && (index < 16)) {
+				this.dyes.add(index, ItemStack.loadItemStackFromNBT(dye));
 			}
 		}
 
@@ -277,6 +319,21 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 		}
 
 		compound.setTag("Items", items);
+
+		final NBTTagList dyes = new NBTTagList();
+
+		for (int i = 0; i < this.dyes.size(); i++) {
+			final ItemStack stack = this.dyes.get(i);
+
+			if (stack != null) {
+				final NBTTagCompound dye = new NBTTagCompound();
+				dye.setByte("Dye", (byte) i);
+				stack.writeToNBT(dye);
+				dyes.appendTag(dye);
+			}
+		}
+
+		compound.setTag("Dyes", dyes);
 
 		final FluidStack liquid = this.waterTank.getFluid();
 		if (liquid != null) {
