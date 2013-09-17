@@ -36,6 +36,11 @@ public class ConfigHandler {
 		ItemInfo.RAINBOW_BLUBBER_BUCKET_ID = getItemFromConfig(
 				ItemInfo.RAINBOW_BLUBBER_BUCKET_KEY,
 				ItemInfo.RAINBOW_BLUBBER_BUCKET_DEFAULT);
+		ItemInfo.BLUBBER_BOTTLE_ID = getItemFromConfig(
+				ItemInfo.BLUBBER_BOTTLE_KEY, ItemInfo.BLUBBER_BOTTLE_DEFAULT);
+		ItemInfo.RAINBOW_BLUBBER_BOTTLE_ID = getItemFromConfig(
+				ItemInfo.RAINBOW_BLUBBER_BOTTLE_KEY,
+				ItemInfo.RAINBOW_BLUBBER_BOTTLE_DEFAULT);
 		ItemInfo.SCALE_HAT_ID = getItemFromConfig(ItemInfo.SCALE_HAT_KEY,
 				ItemInfo.SCALE_HAT_DEFAULT);
 		ItemInfo.SCALE_BOOTS_ID = getItemFromConfig(ItemInfo.SCALE_BOOTS_KEY,

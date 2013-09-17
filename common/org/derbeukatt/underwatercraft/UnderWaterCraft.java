@@ -3,14 +3,9 @@ package org.derbeukatt.underwatercraft;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
 
 import org.derbeukatt.underwatercraft.client.gui.CraftingHandler;
 import org.derbeukatt.underwatercraft.client.gui.GuiHandler;
@@ -19,6 +14,7 @@ import org.derbeukatt.underwatercraft.common.blocks.Blocks;
 import org.derbeukatt.underwatercraft.common.fluids.Fluids;
 import org.derbeukatt.underwatercraft.common.items.Items;
 import org.derbeukatt.underwatercraft.network.PacketHandler;
+import org.derbeukatt.underwatercraft.util.BucketHandler;
 import org.derbeukatt.underwatercraft.util.ClientTickHandler;
 import org.derbeukatt.underwatercraft.util.ConfigHandler;
 
@@ -46,38 +42,6 @@ public class UnderWaterCraft {
 
 	@SidedProxy(clientSide = "org.derbeukatt.underwatercraft.client.ClientProxy", serverSide = "org.derbeukatt.underwatercraft.common.CommonProxy")
 	public static CommonProxy proxy;
-
-	// create this new void to test the enchantment:
-	@ForgeSubscribe
-	public void doPotionEffect(final AttackEntityEvent event) {
-		// final EntityPlayer player = event.entityPlayer;
-		final Entity target = event.target;
-		// final ItemStack equippedItem = player.getCurrentEquippedItem();
-
-		System.out.println("Fire event.");
-
-		if (target instanceof EntityLivingBase) {
-			((EntityLivingBase) target).addPotionEffect(new PotionEffect(
-					Potion.confusion.getId(), 100, 1, true));
-			((EntityLivingBase) target).addPotionEffect(new PotionEffect(
-					Potion.resistance.getId(), 100, 0, true));
-			((EntityLivingBase) target).addPotionEffect(new PotionEffect(
-					Potion.moveSpeed.getId(), 100, 1, true));
-		}
-		//
-		// if ((equippedItem != null) && (equippedItem.getItem() ==
-		// Item.appleRed)) {
-		// if (target instanceof EntityZombie) {
-		// ((EntityZombie) target).addPotionEffect(new PotionEffect(
-		// potion.something.id, 50, 4));
-		// /*
-		// * FMLClientHandler.instance().getClient().ingameGUI.getChatGUI()
-		// * .printChatMessage("I have " + ((EntityZombie)
-		// * target).func_110143_aJ() + " Health");
-		// */
-		// }
-		// }
-	}
 
 	@EventHandler
 	public void invalidFingerPrint(final FMLFingerprintViolationEvent event) {
@@ -111,6 +75,13 @@ public class UnderWaterCraft {
 		Items.init();
 		GameRegistry.registerCraftingHandler(new CraftingHandler());
 		proxy.initRenderers();
+
+		BucketHandler.INSTANCE.buckets.put(Blocks.blubber,
+				Items.itemBlubberBucket);
+		BucketHandler.INSTANCE.buckets.put(Blocks.rainbowBlubber,
+				Items.itemRainbowBlubberBucket);
+
+		MinecraftForge.EVENT_BUS.register(BucketHandler.INSTANCE);
 
 		MinecraftForge.EVENT_BUS.register(this);
 

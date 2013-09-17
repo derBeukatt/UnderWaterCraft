@@ -2,7 +2,7 @@ package org.derbeukatt.underwatercraft.common.blocks;
 
 public class BlockInfo {
 
-	public static final int BLUBBER_DEFAULT = 2076;
+	public static final int BLUBBER_DEFAULT = 2077;
 	public static final String BLUBBER_FLOW_ICON = "blubber_flow";
 
 	public static int BLUBBER_ID;
@@ -30,7 +30,7 @@ public class BlockInfo {
 
 	public static final String BOILER_UNLOCALIZED_NAME = "boiler";
 	public static final String MIXER_BOTTOM = "mixer_bottom";
-	public static final int MIXER_DEFAULT = 2077;
+	public static final int MIXER_DEFAULT = 2076;
 
 	public static int MIXER_ID;
 

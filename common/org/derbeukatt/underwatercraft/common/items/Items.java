@@ -18,6 +18,7 @@ public class Items {
 
 	public static Item itemBlubberBottle;
 	public static Item itemBlubberBucket;
+	public static Item itemRainbowBlubberBottle;
 	public static Item itemRainbowBlubberBucket;
 	public static Item itemScale;
 	public static Item itemScaleBoots;
@@ -37,6 +38,10 @@ public class Items {
 				ItemInfo.BLUBBER_BUCKET_NAME);
 		LanguageRegistry.addName(itemRainbowBlubberBucket,
 				ItemInfo.RAINBOW_BLUBBER_BUCKET_NAME);
+		LanguageRegistry.addName(itemBlubberBottle,
+				ItemInfo.BLUBBER_BOTTLE_NAME);
+		LanguageRegistry.addName(itemRainbowBlubberBottle,
+				ItemInfo.RAINBOW_BLUBBER_BOTTLE_NAME);
 		LanguageRegistry.addName(itemScaleHat, ItemInfo.SCALE_HAT_NAME);
 		LanguageRegistry.addName(itemScaleBoots, ItemInfo.SCALE_BOOTS_NAME);
 	}
@@ -62,6 +67,16 @@ public class Items {
 				ItemInfo.RAINBOW_BLUBBER_BUCKET_UNLOCALIZED_NAME)
 				.setContainerItem(Item.bucketEmpty);
 
+		itemBlubberBottle = new ItemCustomBottle(ItemInfo.BLUBBER_BOTTLE_ID,
+				BlockInfo.BLUBBER_ID).setUnlocalizedName(
+				ItemInfo.BLUBBER_BOTTLE_UNLOCALIZED_NAME).setContainerItem(
+				Item.glassBottle);
+		itemRainbowBlubberBottle = new ItemCustomBottle(
+				ItemInfo.RAINBOW_BLUBBER_BOTTLE_ID,
+				BlockInfo.RAINBOW_BLUBBER_ID).setUnlocalizedName(
+				ItemInfo.RAINBOW_BLUBBER_BOTTLE_UNLOCALIZED_NAME)
+				.setContainerItem(Item.glassBottle);
+
 		itemScaleHat = new ItemScaleHat(ItemInfo.SCALE_HAT_ID);
 		itemScaleBoots = new ItemScaleBoots(ItemInfo.SCALE_BOOTS_ID);
 	}
@@ -75,6 +90,15 @@ public class Items {
 				.getFluidStack("rainbowblubber",
 						FluidContainerRegistry.BUCKET_VOLUME), new ItemStack(
 				itemRainbowBlubberBucket), new ItemStack(Item.bucketEmpty));
+
+		FluidContainerRegistry.registerFluidContainer(
+				FluidRegistry.getFluidStack("blubber",
+						FluidContainerRegistry.BUCKET_VOLUME), new ItemStack(
+						itemBlubberBottle), new ItemStack(Item.glassBottle));
+		FluidContainerRegistry.registerFluidContainer(FluidRegistry
+				.getFluidStack("rainbowblubber",
+						FluidContainerRegistry.BUCKET_VOLUME), new ItemStack(
+				itemRainbowBlubberBottle), new ItemStack(Item.glassBottle));
 	}
 
 	public static void registerRecipes() {
