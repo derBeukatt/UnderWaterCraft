@@ -7,7 +7,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
 import org.derbeukatt.underwatercraft.common.containers.ContainerMixer;
@@ -104,7 +107,7 @@ public class GuiMixer extends GuiContainer {
 		// }
 
 		/* Display water */
-		this.displayGauge(19, 8, this.mixer.getScaledWaterAmount(58),
+		this.displayGauge(19, 8, this.mixer.getScaledBlubberAmount(58),
 				this.mixer.getInputFluid());
 
 		GuiMixer.BOTTLE.draw(this, this.mc.renderEngine, 176, 58);
@@ -140,22 +143,40 @@ public class GuiMixer extends GuiContainer {
 		super.mouseClicked(x, y, button);
 		if (button == 1) {
 			if (GuiMixer.BOTTLE.mouseClicked(this, x, y)) {
-				final ItemStack itemStack = this.inventory.getItemStack();
-				if (itemStack != null) {
-					if (itemStack.itemID == Item.dyePowder.itemID) {
-						if (!this.mixer.dyes.contains(itemStack)) {
-							this.mixer.dyes.add(itemStack);
-							PacketHandler.sendAddedDye(itemStack,
-									this.mixer.xCoord, this.mixer.yCoord,
-									this.mixer.zCoord);
+				if (this.mixer.hasBottleFluid) {
+					final ItemStack itemStack = this.inventory.getItemStack();
+					if (itemStack != null) {
+						if (itemStack.itemID == Item.dyePowder.itemID) {
+							if (!this.mixer.dyes.contains(itemStack)) {
+								this.mixer.dyes.add(itemStack);
+								PacketHandler.sendAddedDye(itemStack,
+										this.mixer.xCoord, this.mixer.yCoord,
+										this.mixer.zCoord);
+							}
 						}
 					}
 				}
 			}
 		} else if (button == 0) {
-			if (this.mixer.dyes.size() == 16) {
-				if (GuiMixer.BOTTLE.mouseClicked(this, x, y)) {
-					System.out.println("would do stuff here");
+			if (GuiMixer.BOTTLE.mouseClicked(this, x, y)) {
+				if ((this.mixer.dyes.size() == 0) && !this.mixer.hasBottleFluid) {
+					final FluidStack amount = this.mixer
+							.drain(ForgeDirection.UNKNOWN,
+									FluidRegistry
+											.getFluidStack(
+													"blubber",
+													FluidContainerRegistry.BUCKET_VOLUME),
+									true);
+					if (amount != null) {
+						if (amount.amount == FluidContainerRegistry.BUCKET_VOLUME) {
+							this.mixer.hasBottleFluid = true;
+							PacketHandler.sendHasBottleFluid(
+									this.mixer.hasBottleFluid, this.mixer
+											.getBlubberTank().getFluidAmount(),
+									this.mixer.xCoord, this.mixer.yCoord,
+									this.mixer.zCoord);
+						}
+					}
 				}
 			}
 		}

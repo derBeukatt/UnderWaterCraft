@@ -40,9 +40,11 @@ public class GuiBottle {
 
 		GL11.glColor4f(1F, 1F, 1F, 1F);
 
-		gui.drawTexturedModelRectFromIcon(gui.getLeft() + this.x + 5,
-				gui.getTop() + this.y + 48, Fluids.blubber.getStillIcon(),
-				this.w - 10, this.h - 53);
+		if (gui.getMixer().hasBottleFluid) {
+			gui.drawTexturedModelRectFromIcon(gui.getLeft() + this.x + 5,
+					gui.getTop() + this.y + 48, Fluids.blubber.getStillIcon(),
+					this.w - 10, this.h - 53);
+		}
 
 		renderEngine.func_110577_a(GuiMixer.TEXTURE);
 		gui.drawTexturedModalRect(gui.getLeft() + this.x,

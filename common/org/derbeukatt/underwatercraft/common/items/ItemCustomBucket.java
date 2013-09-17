@@ -51,12 +51,19 @@ public class ItemCustomBucket extends ItemBucket {
 		}
 
 		if (!world.isRemote) {
+
+			int amplifier = 0;
+
+			if (this.iconName == ItemInfo.RAINBOW_BLUBBER_BUCKET_UNLOCALIZED_NAME) {
+				amplifier++;
+			}
+
 			player.addPotionEffect(new PotionEffect(Potion.confusion.getId(),
-					300, 1));
+					300, 1 + amplifier));
 			player.addPotionEffect(new PotionEffect(Potion.resistance.getId(),
-					300, 0));
+					300, 0 + amplifier));
 			player.addPotionEffect(new PotionEffect(Potion.moveSpeed.getId(),
-					300, 0));
+					300, 0 + amplifier));
 		}
 
 		return item.stackSize <= 0 ? new ItemStack(Item.bucketEmpty) : item;

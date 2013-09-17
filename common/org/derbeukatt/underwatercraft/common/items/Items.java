@@ -18,7 +18,7 @@ public class Items {
 
 	public static Item itemBlubberBottle;
 	public static Item itemBlubberBucket;
-	public static Item itemRainbowBlubberBottle;
+	public static Item itemRainbowBlubberBucket;
 	public static Item itemScale;
 	public static Item itemScaleBoots;
 	public static Item itemScaleHard;
@@ -35,6 +35,8 @@ public class Items {
 		LanguageRegistry.addName(itemScalingKnife, ItemInfo.SCALING_KNIFE_NAME);
 		LanguageRegistry.addName(itemBlubberBucket,
 				ItemInfo.BLUBBER_BUCKET_NAME);
+		LanguageRegistry.addName(itemRainbowBlubberBucket,
+				ItemInfo.RAINBOW_BLUBBER_BUCKET_NAME);
 		LanguageRegistry.addName(itemScaleHat, ItemInfo.SCALE_HAT_NAME);
 		LanguageRegistry.addName(itemScaleBoots, ItemInfo.SCALE_BOOTS_NAME);
 	}
@@ -54,6 +56,11 @@ public class Items {
 				BlockInfo.BLUBBER_ID).setUnlocalizedName(
 				ItemInfo.BLUBBER_BUCKET_UNLOCALIZED_NAME).setContainerItem(
 				Item.bucketEmpty);
+		itemRainbowBlubberBucket = new ItemCustomBucket(
+				ItemInfo.RAINBOW_BLUBBER_BUCKET_ID,
+				BlockInfo.RAINBOW_BLUBBER_ID).setUnlocalizedName(
+				ItemInfo.RAINBOW_BLUBBER_BUCKET_UNLOCALIZED_NAME)
+				.setContainerItem(Item.bucketEmpty);
 
 		itemScaleHat = new ItemScaleHat(ItemInfo.SCALE_HAT_ID);
 		itemScaleBoots = new ItemScaleBoots(ItemInfo.SCALE_BOOTS_ID);
@@ -64,6 +71,10 @@ public class Items {
 				FluidRegistry.getFluidStack("blubber",
 						FluidContainerRegistry.BUCKET_VOLUME), new ItemStack(
 						itemBlubberBucket), new ItemStack(Item.bucketEmpty));
+		FluidContainerRegistry.registerFluidContainer(FluidRegistry
+				.getFluidStack("rainbowblubber",
+						FluidContainerRegistry.BUCKET_VOLUME), new ItemStack(
+				itemRainbowBlubberBucket), new ItemStack(Item.bucketEmpty));
 	}
 
 	public static void registerRecipes() {

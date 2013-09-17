@@ -124,6 +124,10 @@ public class UnderWaterCraft {
 			Fluids.fluidBlubber.setIcons(
 					Blocks.blubber.getBlockTextureFromSide(1),
 					Blocks.blubber.getBlockTextureFromSide(2));
+
+			Fluids.fluidRainbowBlubber.setIcons(
+					Blocks.rainbowBlubber.getBlockTextureFromSide(1),
+					Blocks.rainbowBlubber.getBlockTextureFromSide(2));
 		}
 	}
 }

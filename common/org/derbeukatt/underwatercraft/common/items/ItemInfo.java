@@ -11,14 +11,22 @@ public class ItemInfo {
 	public static final String BLUBBER_BUCKET_UNLOCALIZED_NAME = "blubber_bucket";
 
 	public static final int HARD_SCALE_DEFAULT = 24202;
-
 	public static final String HARD_SCALE_ICON = "scale_hard";
-
 	public static int HARD_SCALE_ID;
+
 	public static final String HARD_SCALE_KEY = "hard_scale";
+
 	public static final String HARD_SCALE_NAME = "Hardened Fish Scale";
 
 	public static final String HARD_SCALE_UNLOCALIZED_NAME = "scaleHard";
+
+	public static final int RAINBOW_BLUBBER_BUCKET_DEFAULT = 24209;
+	public static int RAINBOW_BLUBBER_BUCKET_ID;
+	public static final String RAINBOW_BLUBBER_BUCKET_KEY = "rainbowblubberbucket";
+
+	public static final String RAINBOW_BLUBBER_BUCKET_NAME = "Rainbow Blubber Bucket";
+
+	public static final String RAINBOW_BLUBBER_BUCKET_UNLOCALIZED_NAME = "rainbow_blubber_bucket";
 
 	public static final int SCALE_BOOTS_DEFAULT = 24208;
 

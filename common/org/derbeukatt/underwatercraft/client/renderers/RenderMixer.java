@@ -4,8 +4,8 @@ import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.fluids.FluidRegistry;
 
+import org.derbeukatt.underwatercraft.common.fluids.Fluids;
 import org.derbeukatt.underwatercraft.common.tileentity.TileEntityMixer;
 import org.lwjgl.opengl.GL11;
 
@@ -125,11 +125,10 @@ public class RenderMixer implements ISimpleBlockRenderingHandler {
 		renderer.renderStandardBlock(block, x, y, z);
 
 		if (te.renderHeight > 0) {
-			/* render water tank */
+			/* render blubber tank */
 			renderer.setRenderBounds(0.0625F, 0.4F, 0.0625F, 0.9375F,
 					0.4F + (te.renderHeight * 0.00003125F), 0.9375F);
-			renderer.renderFaceYPos(block, x, y, z,
-					FluidRegistry.WATER.getIcon());
+			renderer.renderFaceYPos(block, x, y, z, Fluids.blubber.getIcon());
 		}
 
 		return true;

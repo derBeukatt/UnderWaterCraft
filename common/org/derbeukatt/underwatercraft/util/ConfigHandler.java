@@ -33,6 +33,9 @@ public class ConfigHandler {
 				ItemInfo.SCALING_KNIFE_KEY, ItemInfo.SCALING_KNIFE_DEFAULT);
 		ItemInfo.BLUBBER_BUCKET_ID = getItemFromConfig(
 				ItemInfo.BLUBBER_BUCKET_KEY, ItemInfo.BLUBBER_BUCKET_DEFAULT);
+		ItemInfo.RAINBOW_BLUBBER_BUCKET_ID = getItemFromConfig(
+				ItemInfo.RAINBOW_BLUBBER_BUCKET_KEY,
+				ItemInfo.RAINBOW_BLUBBER_BUCKET_DEFAULT);
 		ItemInfo.SCALE_HAT_ID = getItemFromConfig(ItemInfo.SCALE_HAT_KEY,
 				ItemInfo.SCALE_HAT_DEFAULT);
 		ItemInfo.SCALE_BOOTS_ID = getItemFromConfig(ItemInfo.SCALE_BOOTS_KEY,
@@ -44,6 +47,9 @@ public class ConfigHandler {
 				BlockInfo.MIXER_DEFAULT).getInt();
 		BlockInfo.BLUBBER_ID = configuration.getBlock(BlockInfo.BLUBBER_KEY,
 				BlockInfo.BLUBBER_DEFAULT).getInt();
+		BlockInfo.RAINBOW_BLUBBER_ID = configuration.getBlock(
+				BlockInfo.RAINBOW_BLUBBER_KEY,
+				BlockInfo.RAINBOW_BLUBBER_DEFAULT).getInt();
 
 		configuration.save();
 	}

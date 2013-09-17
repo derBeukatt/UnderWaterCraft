@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -14,28 +15,31 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
-import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
+
+import org.derbeukatt.underwatercraft.common.fluids.Fluids;
 
 public class TileEntityMixer extends TileEntity implements IFluidHandler,
 		ISidedInventory {
 
 	private static final int MAX_CAPACITY = 16 * FluidContainerRegistry.BUCKET_VOLUME;
 
+	private final FluidTank blubberTank;
+
 	public ArrayList<ItemStack> dyes;
+	public boolean hasBottleFluid;
 
 	private final ItemStack[] items;
-	public int renderHeight;
 
-	private final FluidTank waterTank;
+	public int renderHeight;
 
 	public TileEntityMixer() {
 		this.items = new ItemStack[2];
 		this.dyes = new ArrayList<ItemStack>();
-		this.waterTank = new FluidTank(FluidRegistry.WATER, 0, MAX_CAPACITY);
+		this.blubberTank = new FluidTank(Fluids.blubber, 0, MAX_CAPACITY);
 	}
 
 	@Override
@@ -86,9 +90,9 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 	public FluidStack drain(final ForgeDirection from,
 			final FluidStack resource, final boolean doDrain) {
 
-		final FluidStack amount = this.waterTank
-				.drain(resource.amount, doDrain);
-		this.renderHeight = this.waterTank.getFluidAmount();
+		final FluidStack amount = this.blubberTank.drain(resource.amount,
+				doDrain);
+		this.renderHeight = this.blubberTank.getFluidAmount();
 		this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
 
 		return amount;
@@ -97,8 +101,8 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 	@Override
 	public FluidStack drain(final ForgeDirection from, final int maxDrain,
 			final boolean doDrain) {
-		final FluidStack amount = this.waterTank.drain(maxDrain, doDrain);
-		this.renderHeight = this.waterTank.getFluidAmount();
+		final FluidStack amount = this.blubberTank.drain(maxDrain, doDrain);
+		this.renderHeight = this.blubberTank.getFluidAmount();
 		this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
 
 		return amount;
@@ -108,9 +112,13 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 	public int fill(final ForgeDirection from, final FluidStack resource,
 			final boolean doFill) {
 
-		final int amount = this.waterTank.fill(resource, doFill);
-		this.renderHeight = this.waterTank.getFluidAmount();
-		this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
+		int amount = 0;
+		if (resource.getFluid().getID() == Fluids.blubber.getID()) {
+			amount = this.blubberTank.fill(resource, doFill);
+			this.renderHeight = this.blubberTank.getFluidAmount();
+			this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord,
+					this.zCoord);
+		}
 
 		return amount;
 	}
@@ -122,6 +130,10 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 		slots[1] = 1;
 
 		return slots;
+	}
+
+	public FluidTank getBlubberTank() {
+		return this.blubberTank;
 	}
 
 	@Override
@@ -142,12 +154,14 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 		}
 
 		tag.setTag("Dyes", dyes);
+
+		tag.setBoolean("hasBottleFluid", this.hasBottleFluid);
 		return new Packet132TileEntityData(this.xCoord, this.yCoord,
 				this.zCoord, 1, tag);
 	}
 
 	public FluidStack getInputFluid() {
-		return this.waterTank.getFluid();
+		return this.blubberTank.getFluid();
 	}
 
 	@Override
@@ -160,7 +174,7 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 		return "InventoryMixer";
 	}
 
-	public int getScaledWaterAmount(final int i) {
+	public int getScaledBlubberAmount(final int i) {
 		return this.renderHeight != 0 ? (int) (((float) this.renderHeight / (float) (MAX_CAPACITY)) * i)
 				: 0;
 	}
@@ -189,13 +203,9 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 	public FluidTankInfo[] getTankInfo(final ForgeDirection from) {
 		final FluidTankInfo[] info = new FluidTankInfo[2];
 
-		info[0] = this.waterTank.getInfo();
+		info[0] = this.blubberTank.getInfo();
 
 		return info;
-	}
-
-	public FluidTank getWaterTank() {
-		return this.waterTank;
 	}
 
 	@Override
@@ -225,19 +235,36 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 
 		this.renderHeight = tag.getInteger("renderHeight");
 
-		this.waterTank.setFluid(new FluidStack(FluidRegistry.WATER,
+		this.blubberTank.setFluid(new FluidStack(Fluids.blubber,
 				this.renderHeight));
 
 		final NBTTagList dyes = tag.getTagList("Dyes");
+
+		if (dyes.tagCount() == 0) {
+			this.dyes.clear();
+		}
 
 		for (int i = 0; i < dyes.tagCount(); i++) {
 			final NBTTagCompound dye = (NBTTagCompound) dyes.tagAt(i);
 			final int index = dye.getByte("Dye");
 
 			if ((index >= 0) && (index < 16)) {
-				this.dyes.add(index, ItemStack.loadItemStackFromNBT(dye));
+				final ItemStack loadedStack = ItemStack
+						.loadItemStackFromNBT(dye);
+				boolean found = false;
+				for (final ItemStack stack : this.dyes) {
+					if (loadedStack.getItemDamage() == stack.getItemDamage()) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					this.dyes.add(index, loadedStack);
+				}
 			}
 		}
+
+		this.hasBottleFluid = tag.getBoolean("hasBottleFluid");
 
 		this.worldObj.markBlockForRenderUpdate(this.xCoord, this.yCoord,
 				this.zCoord);
@@ -276,12 +303,13 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 			}
 		}
 
-		final int idWater = compound.getInteger("itemIDWater");
-		final int amountWater = compound.getInteger("amountWater");
+		final int idBlubber = compound.getInteger("itemIDBlubber");
+		final int amountBlubber = compound.getInteger("amountBlubber");
 
-		this.waterTank.setFluid(new FluidStack(idWater, amountWater));
+		this.blubberTank.setFluid(new FluidStack(idBlubber, amountBlubber));
 
 		this.renderHeight = compound.getShort("renderHeight");
+		this.hasBottleFluid = compound.getBoolean("hasBottleFluid");
 	}
 
 	@Override
@@ -299,6 +327,32 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 	@Override
 	public void updateEntity() {
 		if (!this.worldObj.isRemote) {
+
+			final ItemStack destStack = this.getStackInSlot(1);
+			if (destStack == null) {
+				final ItemStack stackInSlot = this.getStackInSlot(0);
+				if ((stackInSlot != null) && this.hasBottleFluid
+						&& (this.dyes.size() == 16)) {
+					final Item item = stackInSlot.getItem();
+					if (item != null) {
+						this.decrStackSize(0, 1);
+
+						final ItemStack filledContainer = FluidContainerRegistry
+								.fillFluidContainer(new FluidStack(
+										Fluids.rainbowBlubber,
+										FluidContainerRegistry.BUCKET_VOLUME),
+										new ItemStack(item));
+
+						this.dyes.clear();
+						this.hasBottleFluid = false;
+						this.setInventorySlotContents(1, filledContainer);
+
+						this.worldObj.markBlockForUpdate(this.xCoord,
+								this.yCoord, this.zCoord);
+					}
+				}
+			}
+
 		}
 	}
 
@@ -335,12 +389,13 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 
 		compound.setTag("Dyes", dyes);
 
-		final FluidStack liquid = this.waterTank.getFluid();
+		final FluidStack liquid = this.blubberTank.getFluid();
 		if (liquid != null) {
-			compound.setInteger("itemIDWater", liquid.fluidID);
-			compound.setInteger("amountWater", liquid.amount);
+			compound.setInteger("itemIDBlubber", liquid.fluidID);
+			compound.setInteger("amountBlubber", liquid.amount);
 		}
 
 		compound.setShort("renderHeight", (short) this.renderHeight);
+		compound.setBoolean("hasBottleFluid", this.hasBottleFluid);
 	}
 }

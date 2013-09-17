@@ -10,8 +10,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.fluids.FluidStack;
 
 import org.derbeukatt.underwatercraft.ModInfo;
+import org.derbeukatt.underwatercraft.common.fluids.Fluids;
 import org.derbeukatt.underwatercraft.common.tileentity.TileEntityMixer;
 import org.derbeukatt.underwatercraft.util.PlayerInputMap;
 
@@ -41,6 +43,28 @@ public class PacketHandler implements IPacketHandler {
 
 		} catch (final IOException ex) {
 			System.err.append("Failed to send dyes!");
+		}
+	}
+
+	public static void sendHasBottleFluid(final boolean hasBottleFluid,
+			final int amount, final int xCoord, final int yCoord,
+			final int zCoord) {
+		final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+		final DataOutputStream dataStream = new DataOutputStream(byteStream);
+
+		try {
+			dataStream.writeByte((byte) 2);
+			dataStream.writeInt(xCoord);
+			dataStream.writeInt(yCoord);
+			dataStream.writeInt(zCoord);
+			dataStream.writeBoolean(hasBottleFluid);
+			dataStream.writeInt(amount);
+
+			PacketDispatcher.sendPacketToServer(PacketDispatcher.getPacket(
+					ModInfo.MOD_CHANNELS, byteStream.toByteArray()));
+
+		} catch (final IOException ex) {
+			System.err.append("Failed to send has bottle fluid!");
 		}
 	}
 
@@ -82,10 +106,10 @@ public class PacketHandler implements IPacketHandler {
 			// System.out.println("read input map!!!");
 			break;
 		case 1:
-			final int xCoord = reader.readInt();
-			final int yCoord = reader.readInt();
-			final int zCoord = reader.readInt();
-			final TileEntity blockTileEntity = entityPlayerMP.worldObj
+			int xCoord = reader.readInt();
+			int yCoord = reader.readInt();
+			int zCoord = reader.readInt();
+			TileEntity blockTileEntity = entityPlayerMP.worldObj
 					.getBlockTileEntity(xCoord, yCoord, zCoord);
 			if (blockTileEntity != null) {
 				if (blockTileEntity instanceof TileEntityMixer) {
@@ -95,7 +119,27 @@ public class PacketHandler implements IPacketHandler {
 							1, dmg);
 					if (!te.dyes.contains(itemStack)) {
 						te.dyes.add(itemStack);
+						te.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 					}
+				}
+			}
+			break;
+		case 2:
+			xCoord = reader.readInt();
+			yCoord = reader.readInt();
+			zCoord = reader.readInt();
+			blockTileEntity = entityPlayerMP.worldObj.getBlockTileEntity(
+					xCoord, yCoord, zCoord);
+			if (blockTileEntity != null) {
+				if (blockTileEntity instanceof TileEntityMixer) {
+					final TileEntityMixer te = (TileEntityMixer) blockTileEntity;
+					final boolean hasBottleFluid = reader.readBoolean();
+					final int amount = reader.readInt();
+					te.renderHeight = amount;
+					te.getBlubberTank().setFluid(
+							new FluidStack(Fluids.blubber, amount));
+					te.hasBottleFluid = hasBottleFluid;
+					te.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 				}
 			}
 			break;
