@@ -29,7 +29,7 @@ public class BlockInfo {
 	public static final String BOILER_TOP = "boiler_top";
 
 	public static final String BOILER_UNLOCALIZED_NAME = "boiler";
-
+	public static final String MIXER_BOTTOM = "mixer_bottom";
 	public static final int MIXER_DEFAULT = 2077;
 
 	public static int MIXER_ID;
@@ -40,7 +40,11 @@ public class BlockInfo {
 
 	public static int MIXER_RENDER_ID;
 
+	public static final String MIXER_SIDE = "mixer_side";
+
 	public static final String MIXER_TE_KEY = "mixerTileEntity";
+
+	public static final String MIXER_TOP = "mixer_top";
 
 	public static final String MIXER_UNLOCALIZED_NAME = "mixer";
 

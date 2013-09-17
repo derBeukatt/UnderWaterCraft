@@ -235,12 +235,11 @@ public class BlockMixer extends BlockContainer {
 	@Override
 	public void registerIcons(final IconRegister register) {
 		this.topIcon = register.registerIcon(new ResourceLocation(
-				BlockInfo.TEXTURE_LOCATION, BlockInfo.BOILER_TOP).toString());
-		this.botIcon = register
-				.registerIcon(new ResourceLocation(BlockInfo.TEXTURE_LOCATION,
-						BlockInfo.BOILER_BOTTOM).toString());
+				BlockInfo.TEXTURE_LOCATION, BlockInfo.MIXER_TOP).toString());
+		this.botIcon = register.registerIcon(new ResourceLocation(
+				BlockInfo.TEXTURE_LOCATION, BlockInfo.MIXER_BOTTOM).toString());
 		this.sideIcon = register.registerIcon(new ResourceLocation(
-				BlockInfo.TEXTURE_LOCATION, BlockInfo.BOILER_SIDE).toString());
+				BlockInfo.TEXTURE_LOCATION, BlockInfo.MIXER_SIDE).toString());
 	}
 
 	@Override
