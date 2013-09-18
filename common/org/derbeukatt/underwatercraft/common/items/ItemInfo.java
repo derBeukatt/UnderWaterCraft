@@ -54,6 +54,14 @@ public class ItemInfo {
 	public static final String SCALE_BOOTS_UNLOCALIZED_NAME = "scaleboots";
 
 	public static final int SCALE_DEFAULT = 24207;
+	public static final int SCALE_HARNESS_DEFAULT = 24211;
+	public static int SCALE_HARNESS_ID;
+
+	public static final String SCALE_HARNESS_KEY = "scaleharness";
+	public static final String SCALE_HARNESS_NAME = "Scale Harness";
+
+	public static final String SCALE_HARNESS_UNLOCALIZED_NAME = "scaleharness";
+
 	public static final int SCALE_HAT_DEFAULT = 24210;
 	public static int SCALE_HAT_ID;
 
@@ -63,10 +71,18 @@ public class ItemInfo {
 	public static final String SCALE_HAT_UNLOCALIZED_NAME = "scalehat";
 
 	public static final String SCALE_ICON = "scale";
-
 	public static int SCALE_ID;
 
 	public static final String SCALE_KEY = "scale";
+	public static final int SCALE_LEGGINGS_DEFAULT = 24212;
+
+	public static int SCALE_LEGGINGS_ID;
+
+	public static final String SCALE_LEGGINGS_KEY = "scaleleggings";
+
+	public static final String SCALE_LEGGINGS_NAME = "Scale Leggings";
+
+	public static final String SCALE_LEGGINGS_UNLOCALIZED_NAME = "scaleleggings";
 
 	public static final String SCALE_NAME = "Fish Scale";
 

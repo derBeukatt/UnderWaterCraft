@@ -9,7 +9,9 @@ import net.minecraftforge.oredict.OreDictionary;
 
 import org.derbeukatt.underwatercraft.common.blocks.BlockInfo;
 import org.derbeukatt.underwatercraft.common.items.armor.ItemScaleBoots;
+import org.derbeukatt.underwatercraft.common.items.armor.ItemScaleHarness;
 import org.derbeukatt.underwatercraft.common.items.armor.ItemScaleHat;
+import org.derbeukatt.underwatercraft.common.items.armor.ItemScaleLeggings;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
@@ -23,7 +25,9 @@ public class Items {
 	public static Item itemScale;
 	public static Item itemScaleBoots;
 	public static Item itemScaleHard;
+	public static Item itemScaleHarness;
 	public static Item itemScaleHat;
+	public static Item itemScaleLeggings;
 	public static Item itemScalePlate;
 	public static Item itemScalingKnife;
 	public static Item itemWhetstone;
@@ -43,6 +47,9 @@ public class Items {
 		LanguageRegistry.addName(itemRainbowBlubberBottle,
 				ItemInfo.RAINBOW_BLUBBER_BOTTLE_NAME);
 		LanguageRegistry.addName(itemScaleHat, ItemInfo.SCALE_HAT_NAME);
+		LanguageRegistry.addName(itemScaleHarness, ItemInfo.SCALE_HARNESS_NAME);
+		LanguageRegistry.addName(itemScaleLeggings,
+				ItemInfo.SCALE_LEGGINGS_NAME);
 		LanguageRegistry.addName(itemScaleBoots, ItemInfo.SCALE_BOOTS_NAME);
 	}
 
@@ -78,6 +85,8 @@ public class Items {
 				.setContainerItem(Item.glassBottle);
 
 		itemScaleHat = new ItemScaleHat(ItemInfo.SCALE_HAT_ID);
+		itemScaleHarness = new ItemScaleHarness(ItemInfo.SCALE_HARNESS_ID);
+		itemScaleLeggings = new ItemScaleLeggings(ItemInfo.SCALE_LEGGINGS_ID);
 		itemScaleBoots = new ItemScaleBoots(ItemInfo.SCALE_BOOTS_ID);
 	}
 

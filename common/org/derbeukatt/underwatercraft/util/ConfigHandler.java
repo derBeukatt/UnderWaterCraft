@@ -43,6 +43,10 @@ public class ConfigHandler {
 				ItemInfo.RAINBOW_BLUBBER_BOTTLE_DEFAULT);
 		ItemInfo.SCALE_HAT_ID = getItemFromConfig(ItemInfo.SCALE_HAT_KEY,
 				ItemInfo.SCALE_HAT_DEFAULT);
+		ItemInfo.SCALE_HARNESS_ID = getItemFromConfig(
+				ItemInfo.SCALE_HARNESS_KEY, ItemInfo.SCALE_HARNESS_DEFAULT);
+		ItemInfo.SCALE_LEGGINGS_ID = getItemFromConfig(
+				ItemInfo.SCALE_LEGGINGS_KEY, ItemInfo.SCALE_LEGGINGS_DEFAULT);
 		ItemInfo.SCALE_BOOTS_ID = getItemFromConfig(ItemInfo.SCALE_BOOTS_KEY,
 				ItemInfo.SCALE_BOOTS_DEFAULT);
 
