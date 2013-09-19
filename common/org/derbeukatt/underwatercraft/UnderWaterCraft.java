@@ -11,6 +11,7 @@ import org.derbeukatt.underwatercraft.client.gui.CraftingHandler;
 import org.derbeukatt.underwatercraft.client.gui.GuiHandler;
 import org.derbeukatt.underwatercraft.common.CommonProxy;
 import org.derbeukatt.underwatercraft.common.blocks.Blocks;
+import org.derbeukatt.underwatercraft.common.entities.Entities;
 import org.derbeukatt.underwatercraft.common.fluids.Fluids;
 import org.derbeukatt.underwatercraft.common.items.Items;
 import org.derbeukatt.underwatercraft.network.PacketHandler;
@@ -73,6 +74,7 @@ public class UnderWaterCraft {
 		Fluids.init();
 		Blocks.init();
 		Items.init();
+		Entities.init();
 		GameRegistry.registerCraftingHandler(new CraftingHandler());
 		proxy.initRenderers();
 
