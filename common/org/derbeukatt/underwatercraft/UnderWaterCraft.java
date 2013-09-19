@@ -3,9 +3,7 @@ package org.derbeukatt.underwatercraft;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.ForgeSubscribe;
 
 import org.derbeukatt.underwatercraft.client.gui.CraftingHandler;
 import org.derbeukatt.underwatercraft.client.gui.GuiHandler;
@@ -17,6 +15,7 @@ import org.derbeukatt.underwatercraft.network.PacketHandler;
 import org.derbeukatt.underwatercraft.util.BucketHandler;
 import org.derbeukatt.underwatercraft.util.ClientTickHandler;
 import org.derbeukatt.underwatercraft.util.ConfigHandler;
+import org.derbeukatt.underwatercraft.util.TextureHandler;
 
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
@@ -31,7 +30,6 @@ import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @Mod(modid = ModInfo.MOD_ID, name = ModInfo.MOD_NAME, version = ModInfo.MOD_VERSION, certificateFingerprint = ModInfo.MOD_FINGERPRINT)
 @NetworkMod(channels = { ModInfo.MOD_CHANNELS }, clientSideRequired = true, serverSideRequired = false, packetHandler = PacketHandler.class)
@@ -82,23 +80,8 @@ public class UnderWaterCraft {
 				Items.itemRainbowBlubberBucket);
 
 		MinecraftForge.EVENT_BUS.register(BucketHandler.INSTANCE);
-
-		MinecraftForge.EVENT_BUS.register(this);
+		MinecraftForge.EVENT_BUS.register(new TextureHandler());
 
 		TickRegistry.registerTickHandler(new ClientTickHandler(), Side.CLIENT);
-	}
-
-	@ForgeSubscribe
-	@SideOnly(Side.CLIENT)
-	public void textureHook(final TextureStitchEvent.Post event) {
-		if (event.map.textureType == 0) {
-			Fluids.fluidBlubber.setIcons(
-					Blocks.blubber.getBlockTextureFromSide(1),
-					Blocks.blubber.getBlockTextureFromSide(2));
-
-			Fluids.fluidRainbowBlubber.setIcons(
-					Blocks.rainbowBlubber.getBlockTextureFromSide(1),
-					Blocks.rainbowBlubber.getBlockTextureFromSide(2));
-		}
 	}
 }
