@@ -103,7 +103,6 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 						+ (forwardZ ? (depth * depthMultiplier) : horiz);
 
 				final int blockId = this.worldObj.getBlockId(x, y, z);
-
 				if ((blockId != Block.brick.blockID)
 						&& (blockId != Blocks.boilerWall.blockID)) {
 					return false;
@@ -114,8 +113,6 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	}
 
 	public boolean checkIfMultiBlock() {
-		// final int blockId = this.worldObj.getBlockId(this.xCoord,
-		// this.yCoord - 1, this.zCoord);
 		boolean result = true;
 		int startX = 0, startZ = 0, depthMultiplier = 1;
 		boolean forwardZ = false;
@@ -123,21 +120,22 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 		final int dir = this.worldObj.getBlockMetadata(this.xCoord,
 				this.yCoord, this.zCoord) & 3;
 		if (dir == BlockBoiler.META_DIR_NORTH) {
-			startX = this.xCoord - 1;
-			startZ = this.zCoord - 2;
+			startX = this.xCoord + 1;
+			startZ = this.zCoord + 2;
 			forwardZ = true;
 		} else if (dir == BlockBoiler.META_DIR_WEST) {
-			startX = this.xCoord - 2;
-			startZ = this.zCoord + 1;
+			startX = this.xCoord + 2;
+			startZ = this.zCoord - 1;
+
 		} else if (dir == BlockBoiler.META_DIR_EAST) {
 			startX = this.xCoord - 2;
 			startZ = this.zCoord + 1;
 			depthMultiplier = -1;
 		} else if (dir == BlockBoiler.META_DIR_SOUTH) {
-			startX = this.xCoord + 1;
-			startZ = this.zCoord + 2;
-			depthMultiplier = -1;
+			startX = this.xCoord - 1;
+			startZ = this.zCoord - 2;
 			forwardZ = true;
+			depthMultiplier = -1;
 		}
 
 		final int blockId = this.worldObj.getBlockId(this.xCoord,
@@ -189,10 +187,12 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 
 				if ((depth <= 1) && (depth >= -1) && (horiz <= 1)
 						&& (horiz >= -1)) {
+
 					if (!this.worldObj.isAirBlock(x, y, z)) {
 						return false;
 					}
-				} else if ((depth == -2) && (horiz == -1)) {
+				} else if ((x == this.xCoord) && (y == this.yCoord)
+						&& (z == this.zCoord)) {
 					continue;
 				} else if (((depth == 2) || (depth == -2))
 						&& ((horiz == 2) || (horiz == -2))) {
@@ -228,7 +228,6 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 						+ (forwardZ ? (depth * depthMultiplier) : horiz);
 
 				final int blockId = this.worldObj.getBlockId(x, y, z);
-
 				if ((depth <= 1) && (depth >= -1) && (horiz <= 1)
 						&& (horiz >= -1)) {
 					if (!this.worldObj.isAirBlock(x, y, z)) {
