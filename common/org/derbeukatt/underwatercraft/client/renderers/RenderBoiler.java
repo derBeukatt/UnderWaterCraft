@@ -4,10 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.fluids.FluidRegistry;
 
-import org.derbeukatt.underwatercraft.common.fluids.Fluids;
-import org.derbeukatt.underwatercraft.common.tileentity.TileEntityBoiler;
 import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
@@ -66,32 +63,8 @@ public class RenderBoiler implements ISimpleBlockRenderingHandler {
 	public void renderInventoryBlock(final Block block, final int metadata,
 			final int modelID, final RenderBlocks renderer) {
 
-		/* bottom */
-		renderer.setRenderBounds(0.0F, 0.25F, 0.0F, 1.0F, 0.4F, 1.0F);
-		renderStandardInvBlock(renderer, block, metadata);
-
-		/* legs */
-		renderer.setRenderBounds(0F, 0F, 0F, 0.25F, 0.25F, 0.25F);
-		renderStandardInvBlock(renderer, block, metadata);
-		renderer.setRenderBounds(0.75F, 0F, 0F, 1F, 0.25F, 0.25F);
-		renderStandardInvBlock(renderer, block, metadata);
-		renderer.setRenderBounds(0F, 0F, 0.75F, 0.25F, 0.25F, 1F);
-		renderStandardInvBlock(renderer, block, metadata);
-		renderer.setRenderBounds(0.75F, 0F, 0.75F, 1F, 0.25F, 1F);
-		renderStandardInvBlock(renderer, block, metadata);
-
-		/* sides */
-		renderer.setRenderBounds(0F, 0.4F, 0F, 1F, 1F, 0.0625F);
-		renderStandardInvBlock(renderer, block, metadata);
-		renderer.setRenderBounds(0F, 0.4F, 0.0625F, 0.0625F, 1F, 0.9375F);
-		renderStandardInvBlock(renderer, block, metadata);
-		renderer.setRenderBounds(0.9375F, 0.4F, 0.0625F, 1F, 1F, 0.9375F);
-		renderStandardInvBlock(renderer, block, metadata);
-		renderer.setRenderBounds(0F, 0.4F, 0.9375F, 1F, 1F, 1F);
-		renderStandardInvBlock(renderer, block, metadata);
-
-		/* separator */
-		renderer.setRenderBounds(0.4375F, 0.4F, 0.0625F, 0.5625F, 1F, 0.9375F);
+		/* block */
+		renderer.setRenderBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 		renderStandardInvBlock(renderer, block, metadata);
 	}
 
@@ -100,53 +73,29 @@ public class RenderBoiler implements ISimpleBlockRenderingHandler {
 			final int y, final int z, final Block block, final int modelId,
 			final RenderBlocks renderer) {
 
-		final TileEntityBoiler te = (TileEntityBoiler) world
-				.getBlockTileEntity(x, y, z);
+		// final TileEntityBoiler te = (TileEntityBoiler) world
+		// .getBlockTileEntity(x, y, z);
 
 		Tessellator.instance.setColorOpaque_F(1F, 1F, 1F);
 
-		/* bottom */
-		renderer.setRenderBounds(0.0F, 0.25F, 0.0F, 1.0F, 0.4F, 1.0F);
+		/* block */
+		renderer.setRenderBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 		renderer.renderStandardBlock(block, x, y, z);
 
-		/* legs */
-		renderer.setRenderBounds(0F, 0F, 0F, 0.25F, 0.25F, 0.25F);
-		renderer.renderStandardBlock(block, x, y, z);
-		renderer.setRenderBounds(0.75F, 0F, 0F, 1F, 0.25F, 0.25F);
-		renderer.renderStandardBlock(block, x, y, z);
-		renderer.setRenderBounds(0F, 0F, 0.75F, 0.25F, 0.25F, 1F);
-		renderer.renderStandardBlock(block, x, y, z);
-		renderer.setRenderBounds(0.75F, 0F, 0.75F, 1F, 0.25F, 1F);
-		renderer.renderStandardBlock(block, x, y, z);
-
-		/* sides */
-		renderer.setRenderBounds(0F, 0.4F, 0F, 1F, 1F, 0.0625F);
-		renderer.renderStandardBlock(block, x, y, z);
-		renderer.setRenderBounds(0F, 0.4F, 0.0625F, 0.0625F, 1F, 0.9375F);
-		renderer.renderStandardBlock(block, x, y, z);
-		renderer.setRenderBounds(0.9375F, 0.4F, 0.0625F, 1F, 1F, 0.9375F);
-		renderer.renderStandardBlock(block, x, y, z);
-		renderer.setRenderBounds(0F, 0.4F, 0.9375F, 1F, 1F, 1F);
-		renderer.renderStandardBlock(block, x, y, z);
-
-		/* separator */
-		renderer.setRenderBounds(0.4375F, 0.4F, 0.0625F, 0.5625F, 1F, 0.9375F);
-		renderer.renderStandardBlock(block, x, y, z);
-
-		if (te.renderHeight > 0) {
-			/* render water tank */
-			renderer.setRenderBounds(0.0625F, 0.4F, 0.0625F, 0.4375F,
-					0.4F + (te.renderHeight * 0.00003125F), 0.9375F);
-			renderer.renderFaceYPos(block, x, y, z,
-					FluidRegistry.WATER.getIcon());
-		}
-
-		if (te.blubberAmount > 0) {
-			/* render blubber tank */
-			renderer.setRenderBounds(0.5625F, 0.4F, 0.0625F, 0.9375F,
-					0.4F + (te.blubberAmount * 0.00003125F), 0.9375F);
-			renderer.renderFaceYPos(block, x, y, z, Fluids.blubber.getIcon());
-		}
+		// if (te.renderHeight > 0) {
+		// /* render water tank */
+		// renderer.setRenderBounds(0.0625F, 0.4F, 0.0625F, 0.4375F,
+		// 0.4F + (te.renderHeight * 0.00003125F), 0.9375F);
+		// renderer.renderFaceYPos(block, x, y, z,
+		// FluidRegistry.WATER.getIcon());
+		// }
+		//
+		// if (te.blubberAmount > 0) {
+		// /* render blubber tank */
+		// renderer.setRenderBounds(0.5625F, 0.4F, 0.0625F, 0.9375F,
+		// 0.4F + (te.blubberAmount * 0.00003125F), 0.9375F);
+		// renderer.renderFaceYPos(block, x, y, z, Fluids.blubber.getIcon());
+		// }
 
 		return true;
 	}

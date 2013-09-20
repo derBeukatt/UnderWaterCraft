@@ -20,6 +20,8 @@ import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
+import org.derbeukatt.underwatercraft.common.blocks.BlockBoiler;
+import org.derbeukatt.underwatercraft.common.blocks.Blocks;
 import org.derbeukatt.underwatercraft.common.fluids.Fluids;
 
 public class TileEntityBoiler extends TileEntity implements IFluidHandler,
@@ -31,8 +33,9 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 
 	public int cookTime;
 	public int heatUpTime;
-	private boolean isBoiling;
 
+	private boolean isBoiling;
+	public boolean isValidMultiBlock;
 	private final ItemStack[] items;
 	public int renderHeight;
 	private final FluidTank waterTank;
@@ -41,6 +44,7 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 		this.items = new ItemStack[3];
 		this.blubberTank = new FluidTank(Fluids.blubber, 0, MAX_CAPACITY);
 		this.waterTank = new FluidTank(FluidRegistry.WATER, 0, MAX_CAPACITY);
+		this.isValidMultiBlock = false;
 	}
 
 	@Override
@@ -79,6 +83,171 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 		}
 	}
 
+	private boolean checkBottomLayer(final int startX, final int startY,
+			final int startZ, final int depthMultiplier, final boolean forwardZ) {
+		/*
+		 * FORWARD BACKWARD North: -z +z South: +z -z East: +x -x West: -x +x
+		 * 
+		 * Should move BACKWARD for depth (facing = direction of block face, not
+		 * direction of player looking at face)
+		 */
+
+		for (int horiz = -1; horiz <= 1; horiz++) // Horizontal (X or Z)
+		{
+			for (int depth = -1; depth <= 1; depth++) // Depth (Z or X)
+			{
+				final int x = startX
+						+ (forwardZ ? horiz : (depth * depthMultiplier));
+				final int y = startY;
+				final int z = startZ
+						+ (forwardZ ? (depth * depthMultiplier) : horiz);
+
+				final int blockId = this.worldObj.getBlockId(x, y, z);
+
+				if ((blockId != Block.brick.blockID)
+						&& (blockId != Blocks.boilerWall.blockID)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	public boolean checkIfMultiBlock() {
+		// final int blockId = this.worldObj.getBlockId(this.xCoord,
+		// this.yCoord - 1, this.zCoord);
+		boolean result = true;
+		int startX = 0, startZ = 0, depthMultiplier = 1;
+		boolean forwardZ = false;
+
+		final int dir = this.worldObj.getBlockMetadata(this.xCoord,
+				this.yCoord, this.zCoord) & 3;
+		if (dir == BlockBoiler.META_DIR_NORTH) {
+			startX = this.xCoord - 1;
+			startZ = this.zCoord - 2;
+			forwardZ = true;
+		} else if (dir == BlockBoiler.META_DIR_WEST) {
+			startX = this.xCoord - 2;
+			startZ = this.zCoord + 1;
+		} else if (dir == BlockBoiler.META_DIR_EAST) {
+			startX = this.xCoord - 2;
+			startZ = this.zCoord + 1;
+			depthMultiplier = -1;
+		} else if (dir == BlockBoiler.META_DIR_SOUTH) {
+			startX = this.xCoord + 1;
+			startZ = this.zCoord + 2;
+			depthMultiplier = -1;
+			forwardZ = true;
+		}
+
+		final int blockId = this.worldObj.getBlockId(this.xCoord,
+				this.yCoord - 1, this.zCoord);
+		if ((blockId == Block.fire.blockID)
+				|| (blockId == Block.lavaMoving.blockID)
+				|| (blockId == Block.lavaStill.blockID)) {
+
+			result = result && true;
+		} else {
+			result = result && false;
+		}
+
+		result = result
+				&& this.checkBottomLayer(startX, this.yCoord - 1, startZ,
+						depthMultiplier, forwardZ);
+
+		result = result
+				&& this.checkMiddleLayer(startX, this.yCoord, startZ,
+						depthMultiplier, forwardZ);
+
+		result = result
+				&& this.checkTopLayer(startX, this.yCoord + 1, startZ,
+						depthMultiplier, forwardZ);
+
+		return result;
+	}
+
+	private boolean checkMiddleLayer(final int startX, final int startY,
+			final int startZ, final int depthMultiplier, final boolean forwardZ) {
+		/*
+		 * FORWARD BACKWARD North: -z +z South: +z -z East: +x -x West: -x +x
+		 * 
+		 * Should move BACKWARD for depth (facing = direction of block face, not
+		 * direction of player looking at face)
+		 */
+
+		for (int horiz = -2; horiz <= 2; horiz++) // Horizontal (X or Z)
+		{
+			for (int depth = -2; depth <= 2; depth++) // Depth (Z or X)
+			{
+				final int x = startX
+						+ (forwardZ ? horiz : (depth * depthMultiplier));
+				final int y = startY;
+				final int z = startZ
+						+ (forwardZ ? (depth * depthMultiplier) : horiz);
+
+				final int blockId = this.worldObj.getBlockId(x, y, z);
+
+				if ((depth <= 1) && (depth >= -1) && (horiz <= 1)
+						&& (horiz >= -1)) {
+					if (!this.worldObj.isAirBlock(x, y, z)) {
+						return false;
+					}
+				} else if ((depth == -2) && (horiz == -1)) {
+					continue;
+				} else if (((depth == 2) || (depth == -2))
+						&& ((horiz == 2) || (horiz == -2))) {
+					continue;
+				} else {
+					if ((blockId != Block.brick.blockID)
+							&& (blockId != Blocks.boilerWall.blockID)) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	private boolean checkTopLayer(final int startX, final int startY,
+			final int startZ, final int depthMultiplier, final boolean forwardZ) {
+		/*
+		 * FORWARD BACKWARD North: -z +z South: +z -z East: +x -x West: -x +x
+		 * 
+		 * Should move BACKWARD for depth (facing = direction of block face, not
+		 * direction of player looking at face)
+		 */
+
+		for (int horiz = -2; horiz <= 2; horiz++) // Horizontal (X or Z)
+		{
+			for (int depth = -2; depth <= 2; depth++) // Depth (Z or X)
+			{
+				final int x = startX
+						+ (forwardZ ? horiz : (depth * depthMultiplier));
+				final int y = startY;
+				final int z = startZ
+						+ (forwardZ ? (depth * depthMultiplier) : horiz);
+
+				final int blockId = this.worldObj.getBlockId(x, y, z);
+
+				if ((depth <= 1) && (depth >= -1) && (horiz <= 1)
+						&& (horiz >= -1)) {
+					if (!this.worldObj.isAirBlock(x, y, z)) {
+						return false;
+					}
+				} else if (((depth == 2) || (depth == -2))
+						&& ((horiz == 2) || (horiz == -2))) {
+					continue;
+				} else {
+					if ((blockId != Block.brick.blockID)
+							&& (blockId != Blocks.boilerWall.blockID)) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+
 	@Override
 	public void closeChest() {
 		// TODO Auto-generated method stub
@@ -99,6 +268,18 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 		}
 
 		return itemStack;
+	}
+
+	public void destroyMultiBlock() {
+		this.isBoiling = false;
+		this.heatUpTime = 0;
+		int meta = this.worldObj.getBlockMetadata(this.xCoord, this.yCoord,
+				this.zCoord);
+		meta &= ~(1 << 2);
+		this.isValidMultiBlock = false;
+		this.transformDummies(Block.brick.blockID);
+		this.worldObj.setBlockMetadataWithNotify(this.xCoord, this.yCoord,
+				this.zCoord, meta, 2);
 	}
 
 	@Override
@@ -183,6 +364,7 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 		tag.setInteger("renderHeight", this.renderHeight);
 		tag.setInteger("blubberAmount", this.blubberAmount);
 		tag.setBoolean("isBoiling", this.isBoiling);
+		tag.setBoolean("isValidMultiBlock", this.isValidMultiBlock);
 		return new Packet132TileEntityData(this.xCoord, this.yCoord,
 				this.zCoord, 1, tag);
 	}
@@ -279,6 +461,11 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 				this.zCoord + 0.5) <= 64;
 	}
 
+	public void makeMultiBlock() {
+		// TODO Auto-generated method stub
+
+	}
+
 	@Override
 	public void onDataPacket(final INetworkManager net,
 			final Packet132TileEntityData packet) {
@@ -293,6 +480,7 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 				this.blubberAmount));
 
 		this.isBoiling = tag.getBoolean("isBoiling");
+		this.isValidMultiBlock = tag.getBoolean("isValidMultiBlock");
 		this.worldObj.markBlockForRenderUpdate(this.xCoord, this.yCoord,
 				this.zCoord);
 	}
@@ -334,6 +522,7 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 
 		this.cookTime = compound.getInteger("cooktime");
 		this.heatUpTime = compound.getInteger("heatUpTime");
+		this.isValidMultiBlock = compound.getBoolean("isValidMultiBlock");
 	}
 
 	@Override
@@ -348,83 +537,174 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 		this.onInventoryChanged();
 	}
 
+	public void transformDummies(final int id) {
+		// final int blockId = this.worldObj.getBlockId(this.xCoord,
+		// this.yCoord - 1, this.zCoord);
+		int startX = 0, startZ = 0, depthMultiplier = 1;
+		boolean forwardZ = false;
+
+		final int dir = this.worldObj.getBlockMetadata(this.xCoord,
+				this.yCoord, this.zCoord) & 3;
+		if (dir == BlockBoiler.META_DIR_NORTH) {
+			startX = this.xCoord - 1;
+			startZ = this.zCoord - 2;
+			forwardZ = true;
+		} else if (dir == BlockBoiler.META_DIR_WEST) {
+			startX = this.xCoord - 2;
+			startZ = this.zCoord + 1;
+		} else if (dir == BlockBoiler.META_DIR_EAST) {
+			startX = this.xCoord - 2;
+			startZ = this.zCoord + 1;
+			depthMultiplier = -1;
+		} else if (dir == BlockBoiler.META_DIR_SOUTH) {
+			startX = this.xCoord + 1;
+			startZ = this.zCoord + 2;
+			depthMultiplier = -1;
+			forwardZ = true;
+		}
+
+		this.transformLayer(startX, this.yCoord - 1, startZ, depthMultiplier,
+				forwardZ, id, -1, 1, -1, 1);
+		this.transformLayer(startX, this.yCoord, startZ, depthMultiplier,
+				forwardZ, id, -2, 2, -2, 2);
+		this.transformLayer(startX, this.yCoord + 1, startZ, depthMultiplier,
+				forwardZ, id, -2, 2, -2, 2);
+	}
+
+	private void transformLayer(final int startX, final int startY,
+			final int startZ, final int depthMultiplier,
+			final boolean forwardZ, final int id, final int horizLimLo,
+			final int horizLimHi, final int depthLimLo, final int depthLimHi) {
+		/*
+		 * FORWARD BACKWARD North: -z +z South: +z -z East: +x -x West: -x +x
+		 * 
+		 * Should move BACKWARD for depth (facing = direction of block face, not
+		 * direction of player looking at face)
+		 */
+
+		for (int horiz = horizLimLo; horiz <= horizLimHi; horiz++) // Horizontal
+																	// (X or Z)
+		{
+			for (int depth = depthLimLo; depth <= depthLimHi; depth++) // Depth
+																		// (Z or
+																		// X)
+			{
+				final int x = startX
+						+ (forwardZ ? horiz : (depth * depthMultiplier));
+				final int y = startY;
+				final int z = startZ
+						+ (forwardZ ? (depth * depthMultiplier) : horiz);
+
+				final int blockId = this.worldObj.getBlockId(x, y, z);
+
+				if (id == Block.brick.blockID) {
+					if (blockId != Blocks.boilerWall.blockID) {
+						continue;
+					}
+					this.worldObj.setBlock(x, y, z, id);
+					this.worldObj.markBlockForUpdate(x, y, z);
+				} else if (id == Blocks.boilerWall.blockID) {
+					if (blockId != Block.brick.blockID) {
+						continue;
+					}
+					this.worldObj.setBlock(x, y, z, id);
+					this.worldObj.markBlockForUpdate(x, y, z);
+					final TileEntityBoilerWall te = (TileEntityBoilerWall) this.worldObj
+							.getBlockTileEntity(x, y, z);
+					te.setBoiler(this);
+				}
+
+			}
+		}
+	}
+
 	@Override
 	public void updateEntity() {
 		if (!this.worldObj.isRemote) {
-			final int blockId = this.worldObj.getBlockId(this.xCoord,
-					this.yCoord - 1, this.zCoord);
-
-			if ((blockId == Block.fire.blockID)
-					|| (blockId == Block.lavaMoving.blockID)
-					|| (blockId == Block.lavaStill.blockID)) {
-
-				if (!this.isBoiling) {
+			int meta = this.worldObj.getBlockMetadata(this.xCoord, this.yCoord,
+					this.zCoord);
+			if (!this.isValidMultiBlock) {
+				if (this.checkIfMultiBlock()) {
 					this.isBoiling = true;
-					this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord,
-							this.zCoord);
+					meta |= (1 << 2);
+					this.isValidMultiBlock = true;
+					this.transformDummies(Blocks.boilerWall.blockID);
+					this.worldObj.setBlockMetadataWithNotify(this.xCoord,
+							this.yCoord, this.zCoord, meta, 2);
 				}
 			} else {
-				if (this.isBoiling) {
+				if (!this.checkIfMultiBlock()) {
 					this.isBoiling = false;
 					this.heatUpTime = 0;
-					this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord,
-							this.zCoord);
-				}
-			}
+					meta &= ~(1 << 2);
+					this.isValidMultiBlock = false;
+					this.transformDummies(Block.brick.blockID);
+					this.worldObj.setBlockMetadataWithNotify(this.xCoord,
+							this.yCoord, this.zCoord, meta, 2);
+				} else {
+					if (this.canSmelt() && (this.heatUpTime == 1000)) {
+						++this.cookTime;
 
-			if (this.canSmelt() && (this.heatUpTime == 1000)) {
-				++this.cookTime;
+						if (this.cookTime == 200) {
+							this.cookTime = 0;
+							this.decrStackSize(0, 1);
+							this.waterTank
+									.setFluid(new FluidStack(
+											FluidRegistry.WATER,
+											this.waterTank.getFluidAmount()
+													- FluidContainerRegistry.BUCKET_VOLUME));
+							this.renderHeight = this.waterTank.getFluidAmount();
+							this.blubberTank
+									.fill(new FluidStack(
+											Fluids.blubber,
+											FluidContainerRegistry.BUCKET_VOLUME),
+											true);
+							this.blubberAmount = (short) this.blubberTank
+									.getFluidAmount();
 
-				if (this.cookTime == 200) {
-					this.cookTime = 0;
-					this.decrStackSize(0, 1);
-					this.waterTank.setFluid(new FluidStack(FluidRegistry.WATER,
-							this.waterTank.getFluidAmount()
-									- FluidContainerRegistry.BUCKET_VOLUME));
-					this.renderHeight = this.waterTank.getFluidAmount();
-					this.blubberTank.fill(new FluidStack(Fluids.blubber,
-							FluidContainerRegistry.BUCKET_VOLUME), true);
-					this.blubberAmount = (short) this.blubberTank
-							.getFluidAmount();
+							this.worldObj.markBlockForUpdate(this.xCoord,
+									this.yCoord, this.zCoord);
+						}
+					} else {
+						if (this.heatUpTime < 1000) {
+							++this.heatUpTime;
+						}
+						this.cookTime = 0;
+					}
 
-					this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord,
-							this.zCoord);
-				}
-			} else {
-				if (this.heatUpTime < 1000) {
-					++this.heatUpTime;
-				}
-				this.cookTime = 0;
-			}
+					final ItemStack destStack = this.getStackInSlot(2);
+					if (destStack == null) {
+						final ItemStack stackInSlot = this.getStackInSlot(1);
+						if ((stackInSlot != null)
+								&& !(this.blubberTank.getFluidAmount() < FluidContainerRegistry.BUCKET_VOLUME)) {
+							final Item item = stackInSlot.getItem();
+							if (item != null) {
+								this.decrStackSize(1, 1);
 
-			final ItemStack destStack = this.getStackInSlot(2);
-			if (destStack == null) {
-				final ItemStack stackInSlot = this.getStackInSlot(1);
-				if ((stackInSlot != null)
-						&& !(this.blubberTank.getFluidAmount() < FluidContainerRegistry.BUCKET_VOLUME)) {
-					final Item item = stackInSlot.getItem();
-					if (item != null) {
-						this.decrStackSize(1, 1);
+								final ItemStack filledContainer = FluidContainerRegistry
+										.fillFluidContainer(
+												new FluidStack(
+														Fluids.blubber,
+														FluidContainerRegistry.BUCKET_VOLUME),
+												new ItemStack(item));
 
-						final ItemStack filledContainer = FluidContainerRegistry
-								.fillFluidContainer(new FluidStack(
-										Fluids.blubber,
-										FluidContainerRegistry.BUCKET_VOLUME),
-										new ItemStack(item));
+								this.blubberTank
+										.setFluid(new FluidStack(
+												Fluids.blubber,
+												this.blubberTank
+														.getFluidAmount()
+														- FluidContainerRegistry.BUCKET_VOLUME));
 
-						this.blubberTank
-								.setFluid(new FluidStack(
-										Fluids.blubber,
-										this.blubberTank.getFluidAmount()
-												- FluidContainerRegistry.BUCKET_VOLUME));
+								this.blubberAmount = (short) this.blubberTank
+										.getFluidAmount();
 
-						this.blubberAmount = (short) this.blubberTank
-								.getFluidAmount();
+								this.setInventorySlotContents(2,
+										filledContainer);
 
-						this.setInventorySlotContents(2, filledContainer);
-
-						this.worldObj.markBlockForUpdate(this.xCoord,
-								this.yCoord, this.zCoord);
+								this.worldObj.markBlockForUpdate(this.xCoord,
+										this.yCoord, this.zCoord);
+							}
+						}
 					}
 				}
 			}
@@ -466,5 +746,6 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 
 		compound.setInteger("cooktime", this.cookTime);
 		compound.setInteger("heatUpTime", this.heatUpTime);
+		compound.setBoolean("isValidMultiBlock", this.isValidMultiBlock);
 	}
 }

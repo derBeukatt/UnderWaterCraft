@@ -12,11 +12,13 @@ public class Blocks {
 
 	public static Block blubber;
 	public static BlockBoiler boiler;
+	public static Block boilerWall;
 	public static Block mixer;
 	public static Block rainbowBlubber;
 
 	public static void addNames() {
 		LanguageRegistry.addName(boiler, BlockInfo.BOILER_NAME);
+		LanguageRegistry.addName(boilerWall, BlockInfo.BOILER_WALL_NAME);
 		LanguageRegistry.addName(mixer, BlockInfo.MIXER_NAME);
 		LanguageRegistry.addName(blubber, BlockInfo.BLUBBER_NAME);
 		LanguageRegistry
@@ -26,6 +28,8 @@ public class Blocks {
 	public static void init() {
 		boiler = new BlockBoiler(BlockInfo.BOILER_ID);
 		GameRegistry.registerBlock(boiler, BlockInfo.BOILER_KEY);
+		boilerWall = new BlockBoilerWall(BlockInfo.BOILER_WALL_ID);
+		GameRegistry.registerBlock(boilerWall, BlockInfo.BOILER_WALL_KEY);
 		mixer = new BlockMixer(BlockInfo.MIXER_ID);
 		GameRegistry.registerBlock(mixer, BlockInfo.MIXER_KEY);
 
