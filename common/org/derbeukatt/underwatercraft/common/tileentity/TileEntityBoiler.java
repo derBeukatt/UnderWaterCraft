@@ -20,9 +20,10 @@ import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
-import org.derbeukatt.underwatercraft.common.blocks.BlockBoiler;
 import org.derbeukatt.underwatercraft.common.blocks.Blocks;
 import org.derbeukatt.underwatercraft.common.fluids.Fluids;
+import org.derbeukatt.underwatercraft.util.CoordHelper;
+import org.derbeukatt.underwatercraft.util.CoordHelper.CoordTuple;
 
 public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 		ISidedInventory {
@@ -112,54 +113,62 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 		return true;
 	}
 
+	private boolean checkHeatSource(final int startX, final int startY,
+			final int startZ, final int depthMultiplier, final boolean forwardZ) {
+		/*
+		 * FORWARD BACKWARD North: -z +z South: +z -z East: +x -x West: -x +x
+		 * 
+		 * Should move BACKWARD for depth (facing = direction of block face, not
+		 * direction of player looking at face)
+		 */
+
+		for (int horiz = -1; horiz <= 1; horiz++) // Horizontal (X or Z)
+		{
+			for (int depth = -1; depth <= 1; depth++) // Depth (Z or X)
+			{
+				final int x = startX
+						+ (forwardZ ? horiz : (depth * depthMultiplier));
+				final int y = startY;
+				final int z = startZ
+						+ (forwardZ ? (depth * depthMultiplier) : horiz);
+
+				final int blockId = this.worldObj.getBlockId(x, y, z);
+				if (blockId != Block.fire.blockID) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	public boolean checkIfMultiBlock() {
 		boolean result = true;
-		int startX = 0, startZ = 0, depthMultiplier = 1;
-		boolean forwardZ = false;
 
-		final int dir = this.worldObj.getBlockMetadata(this.xCoord,
-				this.yCoord, this.zCoord) & 3;
-		if (dir == BlockBoiler.META_DIR_NORTH) {
-			startX = this.xCoord + 1;
-			startZ = this.zCoord + 2;
-			forwardZ = true;
-		} else if (dir == BlockBoiler.META_DIR_WEST) {
-			startX = this.xCoord + 2;
-			startZ = this.zCoord - 1;
+		final int meta = this.worldObj.getBlockMetadata(this.xCoord,
+				this.yCoord, this.zCoord);
 
-		} else if (dir == BlockBoiler.META_DIR_EAST) {
-			startX = this.xCoord - 2;
-			startZ = this.zCoord + 1;
-			depthMultiplier = -1;
-		} else if (dir == BlockBoiler.META_DIR_SOUTH) {
-			startX = this.xCoord - 1;
-			startZ = this.zCoord - 2;
-			forwardZ = true;
-			depthMultiplier = -1;
-		}
-
-		final int blockId = this.worldObj.getBlockId(this.xCoord,
-				this.yCoord - 1, this.zCoord);
-		if ((blockId == Block.fire.blockID)
-				|| (blockId == Block.lavaMoving.blockID)
-				|| (blockId == Block.lavaStill.blockID)) {
-
-			result = result && true;
-		} else {
-			result = result && false;
-		}
+		final CoordTuple coordTuple = CoordHelper
+				.getDirectionSensitiveCoordTuple(meta, this.xCoord, this.zCoord);
 
 		result = result
-				&& this.checkBottomLayer(startX, this.yCoord - 1, startZ,
-						depthMultiplier, forwardZ);
+				&& this.checkHeatSource(coordTuple.getX(), this.yCoord - 2,
+						coordTuple.getZ(), coordTuple.getDepthMultiplier(),
+						coordTuple.isForwardZ());
 
 		result = result
-				&& this.checkMiddleLayer(startX, this.yCoord, startZ,
-						depthMultiplier, forwardZ);
+				&& this.checkBottomLayer(coordTuple.getX(), this.yCoord - 1,
+						coordTuple.getZ(), coordTuple.getDepthMultiplier(),
+						coordTuple.isForwardZ());
 
 		result = result
-				&& this.checkTopLayer(startX, this.yCoord + 1, startZ,
-						depthMultiplier, forwardZ);
+				&& this.checkMiddleLayer(coordTuple.getX(), this.yCoord,
+						coordTuple.getZ(), coordTuple.getDepthMultiplier(),
+						coordTuple.isForwardZ());
+
+		result = result
+				&& this.checkTopLayer(coordTuple.getX(), this.yCoord + 1,
+						coordTuple.getZ(), coordTuple.getDepthMultiplier(),
+						coordTuple.isForwardZ());
 
 		return result;
 	}
@@ -537,39 +546,20 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	}
 
 	public void transformDummies(final int id) {
-		// final int blockId = this.worldObj.getBlockId(this.xCoord,
-		// this.yCoord - 1, this.zCoord);
-		final boolean result = true;
-		int startX = 0, startZ = 0, depthMultiplier = 1;
-		boolean forwardZ = false;
 
-		final int dir = this.worldObj.getBlockMetadata(this.xCoord,
-				this.yCoord, this.zCoord) & 3;
-		if (dir == BlockBoiler.META_DIR_NORTH) {
-			startX = this.xCoord + 1;
-			startZ = this.zCoord + 2;
-			forwardZ = true;
-		} else if (dir == BlockBoiler.META_DIR_WEST) {
-			startX = this.xCoord + 2;
-			startZ = this.zCoord - 1;
-
-		} else if (dir == BlockBoiler.META_DIR_EAST) {
-			startX = this.xCoord - 2;
-			startZ = this.zCoord + 1;
-			depthMultiplier = -1;
-		} else if (dir == BlockBoiler.META_DIR_SOUTH) {
-			startX = this.xCoord - 1;
-			startZ = this.zCoord - 2;
-			forwardZ = true;
-			depthMultiplier = -1;
-		}
-
-		this.transformLayer(startX, this.yCoord - 1, startZ, depthMultiplier,
-				forwardZ, id, -1, 1, -1, 1);
-		this.transformLayer(startX, this.yCoord, startZ, depthMultiplier,
-				forwardZ, id, -2, 2, -2, 2);
-		this.transformLayer(startX, this.yCoord + 1, startZ, depthMultiplier,
-				forwardZ, id, -2, 2, -2, 2);
+		final int meta = this.worldObj.getBlockMetadata(this.xCoord,
+				this.yCoord, this.zCoord);
+		final CoordTuple coordTuple = CoordHelper
+				.getDirectionSensitiveCoordTuple(meta, this.xCoord, this.zCoord);
+		this.transformLayer(coordTuple.getX(), this.yCoord - 1,
+				coordTuple.getZ(), coordTuple.getDepthMultiplier(),
+				coordTuple.isForwardZ(), id, -1, 1, -1, 1);
+		this.transformLayer(coordTuple.getX(), this.yCoord, coordTuple.getZ(),
+				coordTuple.getDepthMultiplier(), coordTuple.isForwardZ(), id,
+				-2, 2, -2, 2);
+		this.transformLayer(coordTuple.getX(), this.yCoord + 1,
+				coordTuple.getZ(), coordTuple.getDepthMultiplier(),
+				coordTuple.isForwardZ(), id, -2, 2, -2, 2);
 	}
 
 	private void transformLayer(final int startX, final int startY,

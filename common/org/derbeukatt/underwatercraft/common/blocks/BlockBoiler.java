@@ -28,18 +28,13 @@ import net.minecraftforge.fluids.FluidStack;
 import org.derbeukatt.underwatercraft.UnderWaterCraft;
 import org.derbeukatt.underwatercraft.client.gui.UnderWaterCraftTab;
 import org.derbeukatt.underwatercraft.common.tileentity.TileEntityBoiler;
+import org.derbeukatt.underwatercraft.util.CoordHelper;
 
 import cpw.mods.fml.common.network.FMLNetworkHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockBoiler extends BlockContainer {
-
-	public static final int META_DIR_EAST = 0x00000003;
-	public static final int META_DIR_NORTH = 0x00000001;
-	public static final int META_DIR_SOUTH = 0x00000002;
-	public static final int META_DIR_WEST = 0x00000000;
-	public static final int META_ISACTIVE = 0x00000004;
 
 	public static ItemStack consumeItem(final ItemStack stack) {
 		if (stack.stackSize == 1) {
@@ -128,7 +123,7 @@ public class BlockBoiler extends BlockContainer {
 	public Icon getIcon(final int side, final int meta) {
 
 		final boolean isActive = ((meta >> 2) == 1);
-		final int facing = (meta & 3);
+		final int facing = (meta & CoordHelper.META_MASK_DIR);
 
 		if (side == this.getSideForFace(facing)) {
 			if (isActive) {
@@ -147,16 +142,16 @@ public class BlockBoiler extends BlockContainer {
 
 	private int getSideForFace(final int face) {
 		switch (face) {
-		case META_DIR_WEST:
+		case CoordHelper.META_DIR_WEST:
 			return 4;
 
-		case META_DIR_EAST:
+		case CoordHelper.META_DIR_EAST:
 			return 5;
 
-		case META_DIR_NORTH:
+		case CoordHelper.META_DIR_NORTH:
 			return 2;
 
-		case META_DIR_SOUTH:
+		case CoordHelper.META_DIR_SOUTH:
 			return 3;
 
 		default:
@@ -251,21 +246,22 @@ public class BlockBoiler extends BlockContainer {
 			final int z, final EntityLivingBase entity,
 			final ItemStack itemStack) {
 		int metadata = 0;
-		int facing = META_DIR_WEST;
+		int facing = CoordHelper.META_DIR_WEST;
 
 		final int dir = MathHelper
-				.floor_double(((entity.rotationYaw * 4f) / 360f) + 0.5) & 3;
+				.floor_double(((entity.rotationYaw * 4f) / 360f) + 0.5)
+				& CoordHelper.META_MASK_DIR;
 		if (dir == 0) {
-			facing = META_DIR_NORTH;
+			facing = CoordHelper.META_DIR_NORTH;
 		}
 		if (dir == 1) {
-			facing = META_DIR_EAST;
+			facing = CoordHelper.META_DIR_EAST;
 		}
 		if (dir == 2) {
-			facing = META_DIR_SOUTH;
+			facing = CoordHelper.META_DIR_SOUTH;
 		}
 		if (dir == 3) {
-			facing = META_DIR_WEST;
+			facing = CoordHelper.META_DIR_WEST;
 		}
 
 		metadata |= facing;
@@ -289,11 +285,11 @@ public class BlockBoiler extends BlockContainer {
 	public void randomDisplayTick(final World world, final int x, final int y,
 			final int z, final Random rand) {
 		final int metadata = world.getBlockMetadata(x, y, z);
-		if ((metadata & META_ISACTIVE) == 0) {
+		if ((metadata & CoordHelper.META_ISACTIVE) == 0) {
 			return;
 		}
 
-		final int facing = metadata & 3;
+		final int facing = metadata & CoordHelper.META_MASK_DIR;
 
 		final double yMod = (0.3 * rand.nextDouble());
 		double xMod = -0.02;
@@ -301,17 +297,17 @@ public class BlockBoiler extends BlockContainer {
 		double temp = 0.0;
 
 		switch (facing) {
-		case META_DIR_EAST:
+		case CoordHelper.META_DIR_EAST:
 			xMod += 1.04;
 			break;
 
-		case META_DIR_NORTH:
+		case CoordHelper.META_DIR_NORTH:
 			temp = xMod;
 			xMod = zMod;
 			zMod = temp;
 			break;
 
-		case META_DIR_SOUTH:
+		case CoordHelper.META_DIR_SOUTH:
 			temp = xMod;
 			xMod = zMod;
 			zMod = temp + 1.04;
