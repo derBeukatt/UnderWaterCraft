@@ -539,27 +539,29 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 	public void transformDummies(final int id) {
 		// final int blockId = this.worldObj.getBlockId(this.xCoord,
 		// this.yCoord - 1, this.zCoord);
+		final boolean result = true;
 		int startX = 0, startZ = 0, depthMultiplier = 1;
 		boolean forwardZ = false;
 
 		final int dir = this.worldObj.getBlockMetadata(this.xCoord,
 				this.yCoord, this.zCoord) & 3;
 		if (dir == BlockBoiler.META_DIR_NORTH) {
-			startX = this.xCoord - 1;
-			startZ = this.zCoord - 2;
+			startX = this.xCoord + 1;
+			startZ = this.zCoord + 2;
 			forwardZ = true;
 		} else if (dir == BlockBoiler.META_DIR_WEST) {
-			startX = this.xCoord - 2;
-			startZ = this.zCoord + 1;
+			startX = this.xCoord + 2;
+			startZ = this.zCoord - 1;
+
 		} else if (dir == BlockBoiler.META_DIR_EAST) {
 			startX = this.xCoord - 2;
 			startZ = this.zCoord + 1;
 			depthMultiplier = -1;
 		} else if (dir == BlockBoiler.META_DIR_SOUTH) {
-			startX = this.xCoord + 1;
-			startZ = this.zCoord + 2;
-			depthMultiplier = -1;
+			startX = this.xCoord - 1;
+			startZ = this.zCoord - 2;
 			forwardZ = true;
+			depthMultiplier = -1;
 		}
 
 		this.transformLayer(startX, this.yCoord - 1, startZ, depthMultiplier,
