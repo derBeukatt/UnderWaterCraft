@@ -17,7 +17,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Icon;
-import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -125,7 +124,7 @@ public class BlockBoiler extends BlockContainer {
 		final boolean isActive = ((meta >> 2) == 1);
 		final int facing = (meta & CoordHelper.META_MASK_DIR);
 
-		if (side == this.getSideForFace(facing)) {
+		if (side == CoordHelper.getSideForBlockFace(facing)) {
 			if (isActive) {
 				return this.frontIconLit;
 			}
@@ -138,25 +137,6 @@ public class BlockBoiler extends BlockContainer {
 	@Override
 	public int getRenderType() {
 		return BlockInfo.BOILER_RENDER_ID;
-	}
-
-	private int getSideForFace(final int face) {
-		switch (face) {
-		case CoordHelper.META_DIR_WEST:
-			return 4;
-
-		case CoordHelper.META_DIR_EAST:
-			return 5;
-
-		case CoordHelper.META_DIR_NORTH:
-			return 2;
-
-		case CoordHelper.META_DIR_SOUTH:
-			return 3;
-
-		default:
-			return 4;
-		}
 	}
 
 	@Override
@@ -245,26 +225,7 @@ public class BlockBoiler extends BlockContainer {
 	public void onBlockPlacedBy(final World world, final int x, final int y,
 			final int z, final EntityLivingBase entity,
 			final ItemStack itemStack) {
-		int metadata = 0;
-		int facing = CoordHelper.META_DIR_WEST;
-
-		final int dir = MathHelper
-				.floor_double(((entity.rotationYaw * 4f) / 360f) + 0.5)
-				& CoordHelper.META_MASK_DIR;
-		if (dir == 0) {
-			facing = CoordHelper.META_DIR_NORTH;
-		}
-		if (dir == 1) {
-			facing = CoordHelper.META_DIR_EAST;
-		}
-		if (dir == 2) {
-			facing = CoordHelper.META_DIR_SOUTH;
-		}
-		if (dir == 3) {
-			facing = CoordHelper.META_DIR_WEST;
-		}
-
-		metadata |= facing;
+		final int metadata = CoordHelper.getBlockFacing(entity);
 
 		world.setBlockMetadataWithNotify(x, y, z, metadata, 2);
 	}

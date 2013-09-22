@@ -28,7 +28,7 @@ import org.derbeukatt.underwatercraft.util.CoordHelper.CoordTuple;
 public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 		ISidedInventory {
 
-	private static final int MAX_CAPACITY = 16 * FluidContainerRegistry.BUCKET_VOLUME;
+	private static final int MAX_CAPACITY = 6 * FluidContainerRegistry.BUCKET_VOLUME;
 	public short blubberAmount;
 	private final FluidTank blubberTank;
 
@@ -148,7 +148,8 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 				this.yCoord, this.zCoord);
 
 		final CoordTuple coordTuple = CoordHelper
-				.getDirectionSensitiveCoordTuple(meta, this.xCoord, this.zCoord);
+				.getDirectionSensitiveCoordTuple(meta, this.xCoord,
+						this.zCoord, 0, 2);
 
 		result = result
 				&& this.checkHeatSource(coordTuple.getX(), this.yCoord - 2,
@@ -196,24 +197,57 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 
 				if ((depth <= 1) && (depth >= -1) && (horiz <= 1)
 						&& (horiz >= -1)) {
-
-					if (!this.worldObj.isAirBlock(x, y, z)) {
-						return false;
+					if (x == startX) {
+						if ((blockId != Block.brick.blockID)
+								&& (blockId != Blocks.boilerWall.blockID)) {
+							return false;
+						}
+					} else {
+						if (!this.worldObj.isAirBlock(x, y, z)) {
+							return false;
+						}
 					}
-				} else if ((x == this.xCoord) && (y == this.yCoord)
-						&& (z == this.zCoord)) {
-					continue;
 				} else if (((depth == 2) || (depth == -2))
 						&& ((horiz == 2) || (horiz == -2))) {
 					continue;
 				} else {
-					if ((blockId != Block.brick.blockID)
-							&& (blockId != Blocks.boilerWall.blockID)) {
-						return false;
+					if ((x == this.xCoord) && (z == this.zCoord)) {
+						continue;
+					} else {
+						if (forwardZ) {
+							if (((x == (this.xCoord + 1)) || (x == (this.xCoord - 1)))
+									&& (z == this.zCoord)) {
+								if ((blockId != Block.brick.blockID)
+										&& (blockId != Blocks.boilerWall.blockID)
+										&& (blockId != Block.glass.blockID)) {
+									return false;
+								}
+							} else {
+								if ((blockId != Block.brick.blockID)
+										&& (blockId != Blocks.boilerWall.blockID)) {
+									return false;
+								}
+							}
+						} else {
+							if (((z == (this.zCoord + 1)) || (z == (this.zCoord - 1)))
+									&& (x == this.xCoord)) {
+								if ((blockId != Block.brick.blockID)
+										&& (blockId != Blocks.boilerWall.blockID)
+										&& (blockId != Block.glass.blockID)) {
+									return false;
+								}
+							} else {
+								if ((blockId != Block.brick.blockID)
+										&& (blockId != Blocks.boilerWall.blockID)) {
+									return false;
+								}
+							}
+						}
 					}
 				}
 			}
 		}
+
 		return true;
 	}
 
@@ -237,18 +271,51 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 						+ (forwardZ ? (depth * depthMultiplier) : horiz);
 
 				final int blockId = this.worldObj.getBlockId(x, y, z);
+
 				if ((depth <= 1) && (depth >= -1) && (horiz <= 1)
 						&& (horiz >= -1)) {
-					if (!this.worldObj.isAirBlock(x, y, z)) {
-						return false;
+					if (x == startX) {
+						if ((blockId != Block.brick.blockID)
+								&& (blockId != Blocks.boilerWall.blockID)) {
+							return false;
+						}
+					} else {
+						if (!this.worldObj.isAirBlock(x, y, z)) {
+							return false;
+						}
 					}
 				} else if (((depth == 2) || (depth == -2))
 						&& ((horiz == 2) || (horiz == -2))) {
 					continue;
 				} else {
-					if ((blockId != Block.brick.blockID)
-							&& (blockId != Blocks.boilerWall.blockID)) {
-						return false;
+					if (forwardZ) {
+						if (((x == (this.xCoord + 1)) || (x == (this.xCoord - 1)))
+								&& (z == this.zCoord)) {
+							if ((blockId != Block.brick.blockID)
+									&& (blockId != Blocks.boilerWall.blockID)
+									&& (blockId != Block.glass.blockID)) {
+								return false;
+							}
+						} else {
+							if ((blockId != Block.brick.blockID)
+									&& (blockId != Blocks.boilerWall.blockID)) {
+								return false;
+							}
+						}
+					} else {
+						if (((z == (this.zCoord + 1)) || ((z == (this.zCoord - 1)) || (z == this.zCoord)))
+								&& (x == this.xCoord)) {
+							if ((blockId != Block.brick.blockID)
+									&& (blockId != Blocks.boilerWall.blockID)
+									&& (blockId != Block.glass.blockID)) {
+								return false;
+							}
+						} else {
+							if ((blockId != Block.brick.blockID)
+									&& (blockId != Blocks.boilerWall.blockID)) {
+								return false;
+							}
+						}
 					}
 				}
 			}
@@ -550,7 +617,8 @@ public class TileEntityBoiler extends TileEntity implements IFluidHandler,
 		final int meta = this.worldObj.getBlockMetadata(this.xCoord,
 				this.yCoord, this.zCoord);
 		final CoordTuple coordTuple = CoordHelper
-				.getDirectionSensitiveCoordTuple(meta, this.xCoord, this.zCoord);
+				.getDirectionSensitiveCoordTuple(meta, this.xCoord,
+						this.zCoord, 0, 2);
 		this.transformLayer(coordTuple.getX(), this.yCoord - 1,
 				coordTuple.getZ(), coordTuple.getDepthMultiplier(),
 				coordTuple.isForwardZ(), id, -1, 1, -1, 1);
