@@ -51,9 +51,9 @@ public class BlockBoiler extends BlockContainer {
 
 	@SideOnly(Side.CLIENT)
 	private Icon frontIcon;
+
 	@SideOnly(Side.CLIENT)
 	private Icon frontIconLit;
-
 	@SideOnly(Side.CLIENT)
 	public Icon particleIcon;
 
@@ -132,6 +132,12 @@ public class BlockBoiler extends BlockContainer {
 		} else {
 			return this.blockIcon;
 		}
+	}
+
+	@Override
+	public int getLightValue(final IBlockAccess world, final int x,
+			final int y, final int z) {
+		return ((world.getBlockMetadata(x, y, z) >> 2) == 0 ? 0 : 15);
 	}
 
 	@Override
