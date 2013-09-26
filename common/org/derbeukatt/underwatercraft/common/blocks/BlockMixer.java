@@ -105,7 +105,7 @@ public class BlockMixer extends BlockContainer {
 				}
 			}
 
-			for (final ItemStack stack : inventory.dyes) {
+			for (final ItemStack stack : inventory.dyes.values()) {
 				if (stack != null) {
 					final float spawnX = x + world.rand.nextFloat();
 					final float spawnY = y + world.rand.nextFloat();

@@ -1,6 +1,6 @@
 package org.derbeukatt.underwatercraft.common.tileentity;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
@@ -29,7 +29,7 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 
 	private final FluidTank blubberTank;
 
-	public ArrayList<ItemStack> dyes;
+	public HashMap<Integer, ItemStack> dyes;
 	public boolean hasBottleFluid;
 
 	private final ItemStack[] items;
@@ -38,7 +38,7 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 
 	public TileEntityMixer() {
 		this.items = new ItemStack[2];
-		this.dyes = new ArrayList<ItemStack>();
+		this.dyes = new HashMap<Integer, ItemStack>();
 		this.blubberTank = new FluidTank(Fluids.blubber, 0, MAX_CAPACITY);
 	}
 
@@ -142,12 +142,12 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 		tag.setInteger("renderHeight", this.renderHeight);
 		final NBTTagList dyes = new NBTTagList();
 
-		for (int i = 0; i < this.dyes.size(); i++) {
-			final ItemStack stack = this.dyes.get(i);
+		for (final int dmg : this.dyes.keySet()) {
+			final ItemStack stack = this.dyes.get(dmg);
 
 			if (stack != null) {
 				final NBTTagCompound dye = new NBTTagCompound();
-				dye.setByte("Dye", (byte) i);
+				dye.setByte("Dye", (byte) dmg);
 				stack.writeToNBT(dye);
 				dyes.appendTag(dye);
 			}
@@ -246,21 +246,10 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 
 		for (int i = 0; i < dyes.tagCount(); i++) {
 			final NBTTagCompound dye = (NBTTagCompound) dyes.tagAt(i);
-			final int index = dye.getByte("Dye");
+			final int dmg = dye.getByte("Dye");
 
-			if ((index >= 0) && (index < 16)) {
-				final ItemStack loadedStack = ItemStack
-						.loadItemStackFromNBT(dye);
-				boolean found = false;
-				for (final ItemStack stack : this.dyes) {
-					if (loadedStack.getItemDamage() == stack.getItemDamage()) {
-						found = true;
-						break;
-					}
-				}
-				if (!found) {
-					this.dyes.add(index, loadedStack);
-				}
+			if (!this.dyes.containsKey(dmg)) {
+				this.dyes.put(dmg, ItemStack.loadItemStackFromNBT(dye));
 			}
 		}
 
@@ -296,11 +285,9 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 
 		for (int i = 0; i < dyes.tagCount(); i++) {
 			final NBTTagCompound dye = (NBTTagCompound) dyes.tagAt(i);
-			final int index = dye.getByte("Dye");
+			final int dmg = dye.getByte("Dye");
 
-			if ((index >= 0) && (index < 16)) {
-				this.dyes.add(index, ItemStack.loadItemStackFromNBT(dye));
-			}
+			this.dyes.put(dmg, ItemStack.loadItemStackFromNBT(dye));
 		}
 
 		final int idBlubber = compound.getInteger("itemIDBlubber");
@@ -376,12 +363,12 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 
 		final NBTTagList dyes = new NBTTagList();
 
-		for (int i = 0; i < this.dyes.size(); i++) {
-			final ItemStack stack = this.dyes.get(i);
+		for (final int dmg : this.dyes.keySet()) {
+			final ItemStack stack = this.dyes.get(dmg);
 
 			if (stack != null) {
 				final NBTTagCompound dye = new NBTTagCompound();
-				dye.setByte("Dye", (byte) i);
+				dye.setByte("Dye", (byte) dmg);
 				stack.writeToNBT(dye);
 				dyes.appendTag(dye);
 			}

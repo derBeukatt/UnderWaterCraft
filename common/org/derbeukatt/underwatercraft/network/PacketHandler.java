@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -20,9 +21,11 @@ import org.derbeukatt.underwatercraft.util.PlayerInputMap;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.IPacketHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.network.Player;
+import cpw.mods.fml.relauncher.Side;
 
 public class PacketHandler implements IPacketHandler {
 
@@ -37,6 +40,7 @@ public class PacketHandler implements IPacketHandler {
 			dataStream.writeInt(yCoord);
 			dataStream.writeInt(zCoord);
 			dataStream.writeInt(dye.getItemDamage());
+			dataStream.writeInt(dye.stackSize);
 
 			PacketDispatcher.sendPacketToServer(PacketDispatcher.getPacket(
 					ModInfo.MOD_CHANNELS, byteStream.toByteArray()));
@@ -84,12 +88,11 @@ public class PacketHandler implements IPacketHandler {
 		}
 	}
 
-	@Override
-	public void onPacketData(final INetworkManager manager,
-			final Packet250CustomPayload packet, final Player player) {
+	private void handleClient(final INetworkManager manager,
+			final Packet250CustomPayload packet,
+			final EntityClientPlayerMP player) {
 		final ByteArrayDataInput reader = ByteStreams.newDataInput(packet.data);
-		final EntityPlayerMP entityPlayerMP = (EntityPlayerMP) player;
-		final String playerName = entityPlayerMP.username;
+		final String playerName = player.username;
 		final byte id = reader.readByte();
 
 		switch (id) {
@@ -97,28 +100,46 @@ public class PacketHandler implements IPacketHandler {
 			final PlayerInputMap inputMap = PlayerInputMap
 					.getInputMapFor(playerName);
 			inputMap.readFromStream(reader);
-			entityPlayerMP.motionX = inputMap.motionX;
-			entityPlayerMP.motionY = inputMap.motionY;
-			entityPlayerMP.motionZ = inputMap.motionZ;
+			break;
+		default:
+			break;
+		}
+	}
 
-			// entityPlayerMP.velocityChanged = true;
+	private void handleServer(final INetworkManager manager,
+			final Packet250CustomPayload packet, final EntityPlayerMP player) {
+		final ByteArrayDataInput reader = ByteStreams.newDataInput(packet.data);
+		final String playerName = player.username;
+		final byte id = reader.readByte();
 
-			// System.out.println("read input map!!!");
+		switch (id) {
+		case 0:
+			final PlayerInputMap inputMap = PlayerInputMap
+					.getInputMapFor(playerName);
+			inputMap.readFromStream(reader);
+			player.motionX = inputMap.motionX;
+			player.motionY = inputMap.motionY;
+			player.motionZ = inputMap.motionZ;
+			PacketDispatcher.sendPacketToAllAround(player.posX, player.posY,
+					player.posZ, 128, player.dimension, packet);
 			break;
 		case 1:
 			int xCoord = reader.readInt();
 			int yCoord = reader.readInt();
 			int zCoord = reader.readInt();
-			TileEntity blockTileEntity = entityPlayerMP.worldObj
-					.getBlockTileEntity(xCoord, yCoord, zCoord);
+			TileEntity blockTileEntity = player.worldObj.getBlockTileEntity(
+					xCoord, yCoord, zCoord);
 			if (blockTileEntity != null) {
 				if (blockTileEntity instanceof TileEntityMixer) {
 					final TileEntityMixer te = (TileEntityMixer) blockTileEntity;
 					final int dmg = reader.readInt();
+					final int stackSize = reader.readInt();
+					player.inventory.setItemStack(new ItemStack(Item.dyePowder,
+							stackSize, dmg));
 					final ItemStack itemStack = new ItemStack(Item.dyePowder,
 							1, dmg);
-					if (!te.dyes.contains(itemStack)) {
-						te.dyes.add(itemStack);
+					if (!te.dyes.containsKey(dmg)) {
+						te.dyes.put(dmg, itemStack);
 						te.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 					}
 				}
@@ -128,8 +149,8 @@ public class PacketHandler implements IPacketHandler {
 			xCoord = reader.readInt();
 			yCoord = reader.readInt();
 			zCoord = reader.readInt();
-			blockTileEntity = entityPlayerMP.worldObj.getBlockTileEntity(
-					xCoord, yCoord, zCoord);
+			blockTileEntity = player.worldObj.getBlockTileEntity(xCoord,
+					yCoord, zCoord);
 			if (blockTileEntity != null) {
 				if (blockTileEntity instanceof TileEntityMixer) {
 					final TileEntityMixer te = (TileEntityMixer) blockTileEntity;
@@ -146,5 +167,18 @@ public class PacketHandler implements IPacketHandler {
 		default:
 			break;
 		}
+
+	}
+
+	@Override
+	public void onPacketData(final INetworkManager manager,
+			final Packet250CustomPayload packet, final Player player) {
+
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+			this.handleClient(manager, packet, (EntityClientPlayerMP) player);
+		} else {
+			this.handleServer(manager, packet, (EntityPlayerMP) player);
+		}
+
 	}
 }

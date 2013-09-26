@@ -4,6 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 
@@ -53,6 +54,20 @@ public class ContainerMixer extends Container {
 				}
 			} else if (FluidContainerRegistry.isEmptyContainer(stack)) {
 				if (!this.mergeItemStack(stack, 37, 38, false)) {
+					return null;
+				}
+			} else if (stack.itemID == Item.dyePowder.itemID) {
+				if (this.mixer.hasBottleFluid) {
+					if (!this.mixer.dyes.containsKey(stack.getItemDamage())) {
+						this.mixer.dyes.put(
+								stack.getItemDamage(),
+								new ItemStack(stack.itemID, 1, stack
+										.getItemDamage()));
+						stack.stackSize--;
+					} else {
+						return null;
+					}
+				} else {
 					return null;
 				}
 			} else {

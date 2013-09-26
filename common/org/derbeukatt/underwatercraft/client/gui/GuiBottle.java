@@ -26,15 +26,16 @@ public class GuiBottle {
 			final int srcX, final int srcY) {
 		renderEngine.func_110577_a(GuiMixer.BLOCK_TEXTURE);
 
-		for (int i = 0; i < gui.getMixer().dyes.size(); i++) {
-			final ItemStack itemStack = gui.getMixer().dyes.get(i);
+		int i = 0;
+		for (final int dmg : gui.getMixer().dyes.keySet()) {
+			final ItemStack itemStack = gui.getMixer().dyes.get(dmg);
 
 			if (itemStack != null) {
 				Gui.drawRect(gui.getLeft() + this.x + 5,
 						(gui.getTop() + this.y + 48) - i, gui.getLeft() + 104,
 						(gui.getTop() + this.y + 47) - i,
-						0xFF000000 | ItemDye.dyeColors[itemStack
-								.getItemDamage()]);
+						0xFF000000 | ItemDye.dyeColors[dmg]);
+				i++;
 			}
 		}
 

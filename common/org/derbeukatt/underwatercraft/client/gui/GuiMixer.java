@@ -147,8 +147,12 @@ public class GuiMixer extends GuiContainer {
 					final ItemStack itemStack = this.inventory.getItemStack();
 					if (itemStack != null) {
 						if (itemStack.itemID == Item.dyePowder.itemID) {
-							if (!this.mixer.dyes.contains(itemStack)) {
-								this.mixer.dyes.add(itemStack);
+							if (!this.mixer.dyes.containsKey(itemStack
+									.getItemDamage())) {
+								this.mixer.dyes.put(itemStack.getItemDamage(),
+										new ItemStack(itemStack.itemID, 1,
+												itemStack.getItemDamage()));
+								itemStack.stackSize--;
 								PacketHandler.sendAddedDye(itemStack,
 										this.mixer.xCoord, this.mixer.yCoord,
 										this.mixer.zCoord);
