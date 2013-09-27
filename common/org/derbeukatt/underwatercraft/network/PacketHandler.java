@@ -156,8 +156,8 @@ public class PacketHandler implements IPacketHandler {
 					final TileEntityMixer te = (TileEntityMixer) blockTileEntity;
 					final boolean hasBottleFluid = reader.readBoolean();
 					final int amount = reader.readInt();
-					te.renderHeight = amount;
-					te.getBlubberTank().setFluid(
+					te.setInputHeight(amount);
+					te.getInputTank().setFluid(
 							new FluidStack(Fluids.blubber, amount));
 					te.hasBottleFluid = hasBottleFluid;
 					te.worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);

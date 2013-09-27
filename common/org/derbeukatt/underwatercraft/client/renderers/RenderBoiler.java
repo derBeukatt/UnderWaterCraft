@@ -132,13 +132,13 @@ public class RenderBoiler implements ISimpleBlockRenderingHandler {
 
 		if (te.isValidMultiBlock) {
 
-			if (te.renderHeight > 0) {
+			if (te.getInputHeight() > 0) {
 
 				final CoordTuple coordTuple = CoordHelper
 						.getDirectionSensitiveCoordTuple(meta, x, z, -1, 2);
 
-				final int nrOfLayers = (te.renderHeight / 3000) + 1;
-				int heightToRender = te.renderHeight;
+				final int nrOfLayers = (te.getInputHeight() / 3000) + 1;
+				int heightToRender = te.getInputHeight();
 				for (int i = 0; i < nrOfLayers; i++) {
 					heightToRender = heightToRender - (3000 * i);
 					this.renderLiquids(coordTuple.getX(), y + i,
@@ -148,11 +148,11 @@ public class RenderBoiler implements ISimpleBlockRenderingHandler {
 				}
 			}
 
-			if (te.blubberAmount > 0) {
+			if (te.getOutputHeight() > 0) {
 				final CoordTuple coordTuple = CoordHelper
 						.getDirectionSensitiveCoordTuple(meta, x, z, 1, 2);
-				final int nrOfLayers = (te.blubberAmount / 3000) + 1;
-				int heightToRender = te.blubberAmount;
+				final int nrOfLayers = (te.getOutputHeight() / 3000) + 1;
+				int heightToRender = te.getOutputHeight();
 				for (int i = 0; i < nrOfLayers; i++) {
 					heightToRender = heightToRender - (3000 * i);
 					this.renderLiquids(coordTuple.getX(), y + i,

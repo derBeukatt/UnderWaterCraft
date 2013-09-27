@@ -1,13 +1,10 @@
 package org.derbeukatt.underwatercraft.client.gui;
 
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.util.Icon;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidStack;
 
+import org.derbeukatt.underwatercraft.client.gui.elements.GuiElement;
+import org.derbeukatt.underwatercraft.client.gui.elements.GuiGauge;
 import org.derbeukatt.underwatercraft.common.containers.ContainerBoiler;
 import org.derbeukatt.underwatercraft.common.tileentity.TileEntityBoiler;
 import org.lwjgl.opengl.GL11;
@@ -16,71 +13,33 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GuiBoiler extends GuiContainer {
+public class GuiBoiler extends Gui {
 
-	private static final ResourceLocation BLOCK_TEXTURE = TextureMap.field_110575_b;
-
-	private static final ResourceLocation TEXTURE = new ResourceLocation(
-			"underwatercraft", "textures/gui/boiler_gui.png");
+	private final GuiElement blubberGauge;
 
 	private final TileEntityBoiler boiler;
+	private final GuiElement waterGauge;
 
 	public GuiBoiler(final InventoryPlayer inventory, final TileEntityBoiler te) {
-		super(new ContainerBoiler(inventory, te));
+		super(new ContainerBoiler(inventory, te), te);
 
 		this.boiler = te;
 
+		this.waterGauge = new GuiGauge(8, 19, 16, 58, te.getInputTank());
+		this.blubberGauge = new GuiGauge(116, 19, 16, 58, te.getOutputTank());
+
+		this.texture = new ResourceLocation("underwatercraft",
+				"textures/gui/boiler_gui.png");
+
 		this.xSize = 176;
 		this.ySize = 166;
-	}
-
-	private void displayGauge(final int line, final int col, int squaled,
-			final FluidStack liquid) {
-		if (liquid == null) {
-			return;
-		}
-		int start = 0;
-
-		Icon liquidIcon = null;
-		final Fluid fluid = liquid.getFluid();
-		if ((fluid != null) && (fluid.getIcon() != null)) {
-			liquidIcon = fluid.getIcon();
-		}
-		this.mc.renderEngine.func_110577_a(BLOCK_TEXTURE);
-
-		if (liquidIcon != null) {
-			while (true) {
-				int x;
-
-				if (squaled > 16) {
-					x = 16;
-					squaled -= 16;
-				} else {
-					x = squaled;
-					squaled = 0;
-				}
-
-				this.drawTexturedModelRectFromIcon(this.guiLeft + col,
-						(this.guiTop + line + 58) - x - start, liquidIcon, 16,
-						16 - (16 - x));
-				start = start + 16;
-
-				if ((x == 0) || (squaled == 0)) {
-					break;
-				}
-			}
-		}
-
-		this.mc.renderEngine.func_110577_a(TEXTURE);
-		this.drawTexturedModalRect(this.guiLeft + col, this.guiTop + line, 176,
-				30, 16, 58);
 	}
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(final float f, final int x,
 			final int y) {
 		GL11.glColor4f(1F, 1F, 1F, 1F);
-		this.mc.renderEngine.func_110577_a(TEXTURE);
+		this.mc.renderEngine.func_110577_a(this.texture);
 
 		/* Dray main gui */
 		this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize,
@@ -95,13 +54,8 @@ public class GuiBoiler extends GuiContainer {
 					14 - heatupProgressScaled, 14, heatupProgressScaled);
 		}
 
-		/* Display water */
-		this.displayGauge(19, 8, this.boiler.getScaledWaterAmount(58),
-				this.boiler.getInputFluid());
-
-		/* Display blubber */
-		this.displayGauge(19, 116, this.boiler.getScaledBlubberAmount(58),
-				this.boiler.getOutputFluid());
+		this.blubberGauge.drawBackground(this, this.mc.renderEngine, 176, 30);
+		this.waterGauge.drawBackground(this, this.mc.renderEngine, 176, 30);
 
 		final int scaledProgress = this.boiler.getCookProgressScaled(24);
 		this.drawTexturedModalRect(this.guiLeft + 80, this.guiTop + 41, 176,
@@ -111,6 +65,15 @@ public class GuiBoiler extends GuiContainer {
 	@Override
 	protected void drawGuiContainerForegroundLayer(final int x, final int y) {
 		this.fontRenderer.drawString("Blubber Boiler", 8, 6, 0x404040);
+		this.blubberGauge.drawForeground(this, this.fontRenderer, x, y);
+		this.waterGauge.drawForeground(this, this.fontRenderer, x, y);
+	}
+
+	@Override
+	public void drawScreen(final int x, final int y, final float f) {
+		super.drawScreen(x, y, f);
+		this.blubberGauge.drawScreen(this, x, y);
+		this.waterGauge.drawScreen(this, x, y);
 	}
 
 }

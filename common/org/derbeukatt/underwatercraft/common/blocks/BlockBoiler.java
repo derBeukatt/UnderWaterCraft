@@ -182,10 +182,10 @@ public class BlockBoiler extends BlockContainer {
 								true);
 					} else if (FluidContainerRegistry.isContainer(heldItem)) {
 						FluidStack fillFluid = null;
-						if (te.getBlubberTank().getFluidAmount() >= FluidContainerRegistry.BUCKET_VOLUME) {
-							fillFluid = te.getBlubberTank().getFluid();
+						if (te.getOutputTank().getFluidAmount() >= FluidContainerRegistry.BUCKET_VOLUME) {
+							fillFluid = te.getOutputTank().getFluid();
 						} else {
-							fillFluid = te.getWaterTank().getFluid();
+							fillFluid = te.getInputTank().getFluid();
 						}
 						final ItemStack fillStack = FluidContainerRegistry
 								.fillFluidContainer(fillFluid, heldItem);
