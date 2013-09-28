@@ -48,7 +48,7 @@ public class CustomFluidTank extends FluidTank {
 		int amount = 0;
 		if ((this.getFluid() != null) && (this.getFluid().amount > 0)) {
 			final ToolTipLine fluidName = new ToolTipLine(this.getFluid()
-					.getFluid().getLocalizedName());
+					.getFluid().getName());
 			fluidName.setSpacing(2);
 			this.toolTip.add(fluidName);
 			amount = this.getFluid().amount;

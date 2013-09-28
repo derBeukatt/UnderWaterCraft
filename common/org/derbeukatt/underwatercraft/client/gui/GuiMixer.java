@@ -39,12 +39,12 @@ public class GuiMixer extends Gui {
 		this.xSize = 176;
 		this.ySize = 166;
 
-		this.blubberGauge = new GuiGauge(8, 19, 16, 58, te.getInputTank());
+		this.blubberGauge = new GuiGauge(this, 8, 19, 16, 58, te.getInputTank());
 
 		this.texture = new ResourceLocation("underwatercraft",
 				"textures/gui/mixer_gui.png");
 
-		this.bottle = new GuiBottle(67, 18, 42, 60);
+		this.bottle = new GuiBottle(this, 67, 18, 42, 60);
 	}
 
 	@Override
@@ -58,30 +58,31 @@ public class GuiMixer extends Gui {
 				this.ySize);
 
 		/* Display blubber */
-		this.blubberGauge.drawBackground(this, this.mc.renderEngine, 176, 0);
+		this.blubberGauge.drawBackground(this.mc.renderEngine, 176, 0);
 
-		this.bottle.drawBackground(this, this.mc.renderEngine, 176, 58);
+		this.bottle.drawBackground(this.mc.renderEngine, 176, 58);
 
 	}
 
 	@Override
 	protected void drawGuiContainerForegroundLayer(final int x, final int y) {
 		this.fontRenderer.drawString("Mixer", 8, 6, 0x404040);
-		this.bottle.drawForeground(this, this.fontRenderer, x, y);
-		this.blubberGauge.drawForeground(this, this.fontRenderer, x, y);
+		this.bottle.drawForeground(this.fontRenderer, x, y);
+		this.blubberGauge.drawForeground(this.fontRenderer, x, y);
 	}
 
 	@Override
 	public void drawScreen(final int x, final int y, final float f) {
 		super.drawScreen(x, y, f);
-		this.blubberGauge.drawScreen(this, x, y);
+		this.blubberGauge.drawScreen(x, y);
+		this.bottle.drawScreen(x, y);
 	}
 
 	@Override
 	protected void mouseClicked(final int x, final int y, final int button) {
 		super.mouseClicked(x, y, button);
 		if (button == 1) {
-			if (this.bottle.mouseActionInElement(this, x, y)) {
+			if (this.bottle.mouseActionInElement(x, y)) {
 				if (this.mixer.hasBottleFluid) {
 					final ItemStack itemStack = this.inventory.getItemStack();
 					if (itemStack != null) {
@@ -101,7 +102,7 @@ public class GuiMixer extends Gui {
 				}
 			}
 		} else if (button == 0) {
-			if (this.bottle.mouseActionInElement(this, x, y)) {
+			if (this.bottle.mouseActionInElement(x, y)) {
 				if ((this.mixer.dyes.size() == 0) && !this.mixer.hasBottleFluid) {
 					final FluidStack amount = this.mixer
 							.drain(ForgeDirection.UNKNOWN,

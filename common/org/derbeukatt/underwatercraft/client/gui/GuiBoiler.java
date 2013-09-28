@@ -25,8 +25,9 @@ public class GuiBoiler extends Gui {
 
 		this.boiler = te;
 
-		this.waterGauge = new GuiGauge(8, 19, 16, 58, te.getInputTank());
-		this.blubberGauge = new GuiGauge(116, 19, 16, 58, te.getOutputTank());
+		this.waterGauge = new GuiGauge(this, 8, 19, 16, 58, te.getInputTank());
+		this.blubberGauge = new GuiGauge(this, 116, 19, 16, 58,
+				te.getOutputTank());
 
 		this.texture = new ResourceLocation("underwatercraft",
 				"textures/gui/boiler_gui.png");
@@ -54,8 +55,8 @@ public class GuiBoiler extends Gui {
 					14 - heatupProgressScaled, 14, heatupProgressScaled);
 		}
 
-		this.blubberGauge.drawBackground(this, this.mc.renderEngine, 176, 30);
-		this.waterGauge.drawBackground(this, this.mc.renderEngine, 176, 30);
+		this.blubberGauge.drawBackground(this.mc.renderEngine, 176, 30);
+		this.waterGauge.drawBackground(this.mc.renderEngine, 176, 30);
 
 		final int scaledProgress = this.boiler.getCookProgressScaled(24);
 		this.drawTexturedModalRect(this.guiLeft + 80, this.guiTop + 41, 176,
@@ -65,15 +66,15 @@ public class GuiBoiler extends Gui {
 	@Override
 	protected void drawGuiContainerForegroundLayer(final int x, final int y) {
 		this.fontRenderer.drawString("Blubber Boiler", 8, 6, 0x404040);
-		this.blubberGauge.drawForeground(this, this.fontRenderer, x, y);
-		this.waterGauge.drawForeground(this, this.fontRenderer, x, y);
+		this.blubberGauge.drawForeground(this.fontRenderer, x, y);
+		this.waterGauge.drawForeground(this.fontRenderer, x, y);
 	}
 
 	@Override
 	public void drawScreen(final int x, final int y, final float f) {
 		super.drawScreen(x, y, f);
-		this.blubberGauge.drawScreen(this, x, y);
-		this.waterGauge.drawScreen(this, x, y);
+		this.blubberGauge.drawScreen(x, y);
+		this.waterGauge.drawScreen(x, y);
 	}
 
 }

@@ -16,13 +16,13 @@ public class GuiGauge extends GuiElement {
 
 	private final CustomFluidTank tank;
 
-	public GuiGauge(final int x, final int y, final int w, final int h,
-			final CustomFluidTank tank) {
-		super(x, y, w, h);
+	public GuiGauge(final Gui gui, final int x, final int y, final int w,
+			final int h, final CustomFluidTank tank) {
+		super(gui, x, y, w, h);
 		this.tank = tank;
 	}
 
-	private void displayGauge(final Gui gui, final TextureManager renderEngine,
+	private void displayGauge(final TextureManager renderEngine,
 			final int line, final int col, int squaled,
 			final FluidStack liquid, final int srcX, final int srcY) {
 		if (liquid == null) {
@@ -49,9 +49,10 @@ public class GuiGauge extends GuiElement {
 					squaled = 0;
 				}
 
-				gui.drawTexturedModelRectFromIcon(gui.getLeft() + col,
-						(gui.getTop() + line + this.h) - x - start, liquidIcon,
-						this.w, this.w - (this.w - x));
+				this.gui.drawTexturedModelRectFromIcon(
+						this.gui.getLeft() + col,
+						(this.gui.getTop() + line + this.h) - x - start,
+						liquidIcon, this.w, this.w - (this.w - x));
 				start = start + this.w;
 
 				if ((x == 0) || (squaled == 0)) {
@@ -60,28 +61,28 @@ public class GuiGauge extends GuiElement {
 			}
 		}
 
-		renderEngine.func_110577_a(gui.texture);
-		gui.drawTexturedModalRect(gui.getLeft() + col, gui.getTop() + line,
-				srcX, srcY, this.w, this.h);
+		renderEngine.func_110577_a(this.gui.texture);
+		this.gui.drawTexturedModalRect(this.gui.getLeft() + col,
+				this.gui.getTop() + line, srcX, srcY, this.w, this.h);
 	}
 
 	@Override
-	public void drawBackground(final Gui gui,
-			final TextureManager renderEngine, final int srcX, final int srcY) {
-		this.displayGauge(gui, renderEngine, this.y, this.x,
+	public void drawBackground(final TextureManager renderEngine,
+			final int srcX, final int srcY) {
+		this.displayGauge(renderEngine, this.y, this.x,
 				this.tank.getScaledFluidAmount(58), this.tank.getFluid(), srcX,
 				srcY);
 	}
 
 	@Override
-	public void drawForeground(final Gui gui, final FontRenderer fontRenderer,
-			final int srcX, final int srcY) {
+	public void drawForeground(final FontRenderer fontRenderer, final int srcX,
+			final int srcY) {
 	}
 
 	@Override
-	public void drawScreen(final Gui gui, final int x, final int y) {
-		final int left = gui.getLeft();
-		final int top = gui.getTop();
+	public void drawScreen(final int x, final int y) {
+		final int left = this.gui.getLeft();
+		final int top = this.gui.getTop();
 
 		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -94,11 +95,11 @@ public class GuiGauge extends GuiElement {
 		if (tips == null) {
 			return;
 		}
-		final boolean mouseOver = this.mouseActionInElement(gui, x, y);
+		final boolean mouseOver = this.mouseActionInElement(x, y);
 		tips.onTick(mouseOver);
 		if (mouseOver && tips.isReady()) {
 			tips.refresh();
-			gui.drawToolTips(tips, x, y);
+			this.gui.drawToolTips(tips, x, y);
 		}
 
 		GL11.glPopMatrix();
