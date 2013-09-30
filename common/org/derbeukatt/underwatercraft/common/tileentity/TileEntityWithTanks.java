@@ -20,10 +20,6 @@ public class TileEntityWithTanks extends TileEntity implements IFluidHandler {
 	protected int outputHeight;
 	protected CustomFluidTank outputTank;
 
-	public TileEntityWithTanks() {
-		// TODO Auto-generated constructor stub
-	}
-
 	@Override
 	public boolean canDrain(final ForgeDirection from, final Fluid fluid) {
 		return true;
