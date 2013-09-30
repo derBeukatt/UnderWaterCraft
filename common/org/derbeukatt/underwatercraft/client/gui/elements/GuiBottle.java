@@ -3,12 +3,14 @@ package org.derbeukatt.underwatercraft.client.gui.elements;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 
 import org.derbeukatt.underwatercraft.client.gui.Gui;
 import org.derbeukatt.underwatercraft.client.gui.tooltips.ToolTip;
+import org.derbeukatt.underwatercraft.client.gui.tooltips.ToolTipIconLine;
 import org.derbeukatt.underwatercraft.client.gui.tooltips.ToolTipLine;
 import org.derbeukatt.underwatercraft.common.fluids.Fluids;
 import org.derbeukatt.underwatercraft.common.tileentity.TileEntityMixer;
@@ -70,7 +72,6 @@ public class GuiBottle extends GuiElement {
 	@Override
 	public void drawForeground(final FontRenderer fontRenderer, final int srcX,
 			final int srcY) {
-
 	}
 
 	@Override
@@ -113,22 +114,44 @@ public class GuiBottle extends GuiElement {
 
 		if ((te != null) && (te instanceof TileEntityMixer)) {
 			final TileEntityMixer mixer = (TileEntityMixer) te;
-			final ToolTipLine header = new ToolTipLine("Missing colors: ");
-			header.setSpacing(5);
-			this.toolTip.add(header);
-			for (int i = 0; i < (ItemDye.dyeColors.length - 3); i += 4) {
-				if (!mixer.dyes.containsKey(i)) {
-					final ToolTipLine colorLine = new ToolTipLine(
-							ItemDye.dyeColorNames[i] + ", "
-									+ ItemDye.dyeColorNames[i + 1] + ", "
-									+ ItemDye.dyeColorNames[i + 2] + ", "
-									+ ItemDye.dyeColorNames[i + 3]);
-					colorLine.setSpacing(1);
-					this.toolTip.add(colorLine);
-				}
-			}
+			if (mixer.dyes.size() != 16) {
+				final ToolTipLine header = new ToolTipLine("Missing colors: ");
+				header.setSpacing(5);
+				this.toolTip.add(header);
+				int count = 0;
+				ToolTipIconLine iconLine = new ToolTipIconLine();
+				for (int i = 0; i < ItemDye.dyeColors.length; i++) {
+					if (!mixer.dyes.containsKey(i)) {
 
-			this.toolTip.add(new ToolTipLine());
+						iconLine.addIcon(Item.dyePowder.getIconFromDamage(i));
+						count++;
+						if ((count % 4) == 0) {
+							count = 0;
+							iconLine.setSpacing(2);
+							this.toolTip.add(iconLine);
+							iconLine = new ToolTipIconLine();
+						}
+					}
+				}
+
+				if (iconLine.iconList.size() > 0) {
+					iconLine.setSpacing(2);
+					this.toolTip.add(iconLine);
+				}
+			} else {
+				final ToolTipLine header = new ToolTipLine(
+						"Insert Bucket in upper right", 2);
+				final ToolTipLine middle = new ToolTipLine("slot to fill with",
+						2);
+				final ToolTipLine footer = new ToolTipLine("Rainbow Blubber!",
+						2);
+				header.setSpacing(0);
+				middle.setSpacing(0);
+				footer.setSpacing(0);
+				this.toolTip.add(header);
+				this.toolTip.add(middle);
+				this.toolTip.add(footer);
+			}
 		}
 
 	}

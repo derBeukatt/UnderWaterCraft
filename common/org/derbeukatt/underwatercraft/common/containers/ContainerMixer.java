@@ -53,7 +53,7 @@ public class ContainerMixer extends Container {
 					return null;
 				}
 			} else if (FluidContainerRegistry.isEmptyContainer(stack)) {
-				if (!this.mergeItemStack(stack, 37, 38, false)) {
+				if (!this.mergeItemStack(stack, 36, 37, false)) {
 					return null;
 				}
 			} else if (stack.itemID == Item.dyePowder.itemID) {

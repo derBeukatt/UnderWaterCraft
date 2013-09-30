@@ -1,6 +1,8 @@
 package org.derbeukatt.underwatercraft.client.gui;
 
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.inventory.Container;
 import net.minecraft.tileentity.TileEntity;
@@ -12,6 +14,7 @@ import org.derbeukatt.underwatercraft.client.gui.tooltips.ToolTipLine;
 public class Gui extends GuiContainer {
 
 	public static final ResourceLocation BLOCK_TEXTURE = TextureMap.field_110575_b;
+	public static final ResourceLocation ITEM_TEXTURE = TextureMap.field_110576_c;
 	public ResourceLocation texture;
 	private final TileEntity tileEntity;
 
@@ -33,62 +36,67 @@ public class Gui extends GuiContainer {
 		if (toolTips.size() > 0) {
 			final int left = this.guiLeft;
 			final int top = this.guiTop;
-			int lenght = 0;
+			int length = 0;
 			int x;
 			int y;
 
 			for (final ToolTipLine tip : toolTips) {
-				y = this.fontRenderer.getStringWidth(tip.text);
+				y = tip.getLength(this.fontRenderer);
 
-				if (y > lenght) {
-					lenght = y;
+				if (y > length) {
+					length = y;
 				}
 			}
 
 			x = (mouseX - left) + 12;
 			y = mouseY - top - 12;
-			int var14 = 8;
+			int var14 = 0;
+			int multiplier = 0;
 
 			if (toolTips.size() > 1) {
-				var14 += 2 + ((toolTips.size() - 1) * 10);
+				for (final ToolTipLine tip : toolTips) {
+					final int height = tip.getHeight();
+					final int heightMultiplier = tip.getHeightMultiplier();
+
+					if (height > var14) {
+						var14 = height;
+					}
+
+					if (heightMultiplier > multiplier) {
+						multiplier = heightMultiplier;
+					}
+				}
 			}
+
+			var14 += 2 + ((toolTips.size() - 1) * multiplier);
 
 			this.zLevel = 300.0F;
 			itemRenderer.zLevel = 300.0F;
 			final int var15 = -267386864;
-			this.drawGradientRect(x - 3, y - 4, x + lenght + 3, y - 3, var15,
+			this.drawGradientRect(x - 3, y - 4, x + length + 3, y - 3, var15,
 					var15);
-			this.drawGradientRect(x - 3, y + var14 + 3, x + lenght + 3, y
+			this.drawGradientRect(x - 3, y + var14 + 3, x + length + 3, y
 					+ var14 + 4, var15, var15);
-			this.drawGradientRect(x - 3, y - 3, x + lenght + 3, y + var14 + 3,
+			this.drawGradientRect(x - 3, y - 3, x + length + 3, y + var14 + 3,
 					var15, var15);
 			this.drawGradientRect(x - 4, y - 3, x - 3, y + var14 + 3, var15,
 					var15);
-			this.drawGradientRect(x + lenght + 3, y - 3, x + lenght + 4, y
+			this.drawGradientRect(x + length + 3, y - 3, x + length + 4, y
 					+ var14 + 3, var15, var15);
 			final int var16 = 1347420415;
 			final int var17 = ((var16 & 16711422) >> 1) | (var16 & -16777216);
 			this.drawGradientRect(x - 3, (y - 3) + 1, (x - 3) + 1,
 					(y + var14 + 3) - 1, var16, var17);
-			this.drawGradientRect(x + lenght + 2, (y - 3) + 1, x + lenght + 3,
+			this.drawGradientRect(x + length + 2, (y - 3) + 1, x + length + 3,
 					(y + var14 + 3) - 1, var16, var17);
-			this.drawGradientRect(x - 3, y - 3, x + lenght + 3, (y - 3) + 1,
+			this.drawGradientRect(x - 3, y - 3, x + length + 3, (y - 3) + 1,
 					var16, var16);
-			this.drawGradientRect(x - 3, y + var14 + 2, x + lenght + 3, y
+			this.drawGradientRect(x - 3, y + var14 + 2, x + length + 3, y
 					+ var14 + 3, var17, var17);
 
 			for (final ToolTipLine tip : toolTips) {
-				String line = tip.text;
-
-				if (tip.color == -1) {
-					line = "\u00a77" + line;
-				} else {
-					line = "\u00a7" + Integer.toHexString(tip.color) + line;
-				}
-
-				this.fontRenderer.drawStringWithShadow(line, x, y, -1);
-
-				y += 10 + tip.getSpacing();
+				tip.draw(this, x, y);
+				y += tip.getHeightMultiplier() + tip.getSpacing();
 			}
 
 			this.zLevel = 0.0F;
@@ -96,8 +104,16 @@ public class Gui extends GuiContainer {
 		}
 	}
 
+	public FontRenderer getFontRenderer() {
+		return this.fontRenderer;
+	}
+
 	public int getLeft() {
 		return this.guiLeft;
+	}
+
+	public TextureManager getRenderEngine() {
+		return this.mc.renderEngine;
 	}
 
 	public TileEntity getTileEntity() {
