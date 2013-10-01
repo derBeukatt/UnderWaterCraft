@@ -1,6 +1,6 @@
 package org.derbeukatt.underwatercraft.common.tileentity;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
@@ -11,51 +11,32 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet132TileEntityData;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.ForgeDirection;
-import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
-import net.minecraftforge.fluids.FluidTankInfo;
-import net.minecraftforge.fluids.IFluidHandler;
 
+import org.derbeukatt.underwatercraft.common.fluids.CustomFluidTank;
 import org.derbeukatt.underwatercraft.common.fluids.Fluids;
 
-public class TileEntityMixer extends TileEntity implements IFluidHandler,
+public class TileEntityMixer extends TileEntityWithTanks implements
 		ISidedInventory {
 
-	private static final int MAX_CAPACITY = 16 * FluidContainerRegistry.BUCKET_VOLUME;
-
-	private final FluidTank blubberTank;
-
-	public ArrayList<ItemStack> dyes;
+	public HashMap<Integer, ItemStack> dyes;
 	public boolean hasBottleFluid;
 
 	private final ItemStack[] items;
 
-	public int renderHeight;
-
 	public TileEntityMixer() {
 		this.items = new ItemStack[2];
-		this.dyes = new ArrayList<ItemStack>();
-		this.blubberTank = new FluidTank(Fluids.blubber, 0, MAX_CAPACITY);
-	}
-
-	@Override
-	public boolean canDrain(final ForgeDirection from, final Fluid fluid) {
-		return true;
+		this.dyes = new HashMap<Integer, ItemStack>();
+		this.maxCapacity = 16 * FluidContainerRegistry.BUCKET_VOLUME;
+		this.inputTank = new CustomFluidTank(Fluids.blubber, 0,
+				this.maxCapacity);
 	}
 
 	@Override
 	public boolean canExtractItem(final int i, final ItemStack itemstack,
 			final int j) {
 		return i == 1;
-	}
-
-	@Override
-	public boolean canFill(final ForgeDirection from, final Fluid fluid) {
-		return true;
 	}
 
 	@Override
@@ -87,43 +68,6 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 	}
 
 	@Override
-	public FluidStack drain(final ForgeDirection from,
-			final FluidStack resource, final boolean doDrain) {
-
-		final FluidStack amount = this.blubberTank.drain(resource.amount,
-				doDrain);
-		this.renderHeight = this.blubberTank.getFluidAmount();
-		this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
-
-		return amount;
-	}
-
-	@Override
-	public FluidStack drain(final ForgeDirection from, final int maxDrain,
-			final boolean doDrain) {
-		final FluidStack amount = this.blubberTank.drain(maxDrain, doDrain);
-		this.renderHeight = this.blubberTank.getFluidAmount();
-		this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord, this.zCoord);
-
-		return amount;
-	}
-
-	@Override
-	public int fill(final ForgeDirection from, final FluidStack resource,
-			final boolean doFill) {
-
-		int amount = 0;
-		if (resource.getFluid().getID() == Fluids.blubber.getID()) {
-			amount = this.blubberTank.fill(resource, doFill);
-			this.renderHeight = this.blubberTank.getFluidAmount();
-			this.worldObj.markBlockForUpdate(this.xCoord, this.yCoord,
-					this.zCoord);
-		}
-
-		return amount;
-	}
-
-	@Override
 	public int[] getAccessibleSlotsFromSide(final int var1) {
 		final int[] slots = new int[2];
 		slots[0] = 0;
@@ -132,22 +76,18 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 		return slots;
 	}
 
-	public FluidTank getBlubberTank() {
-		return this.blubberTank;
-	}
-
 	@Override
 	public Packet getDescriptionPacket() {
 		final NBTTagCompound tag = new NBTTagCompound();
-		tag.setInteger("renderHeight", this.renderHeight);
+		tag.setInteger("inputHeight", this.inputHeight);
 		final NBTTagList dyes = new NBTTagList();
 
-		for (int i = 0; i < this.dyes.size(); i++) {
-			final ItemStack stack = this.dyes.get(i);
+		for (final int dmg : this.dyes.keySet()) {
+			final ItemStack stack = this.dyes.get(dmg);
 
 			if (stack != null) {
 				final NBTTagCompound dye = new NBTTagCompound();
-				dye.setByte("Dye", (byte) i);
+				dye.setByte("Dye", (byte) dmg);
 				stack.writeToNBT(dye);
 				dyes.appendTag(dye);
 			}
@@ -160,10 +100,6 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 				this.zCoord, 1, tag);
 	}
 
-	public FluidStack getInputFluid() {
-		return this.blubberTank.getFluid();
-	}
-
 	@Override
 	public int getInventoryStackLimit() {
 		return 64;
@@ -172,11 +108,6 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 	@Override
 	public String getInvName() {
 		return "InventoryMixer";
-	}
-
-	public int getScaledBlubberAmount(final int i) {
-		return this.renderHeight != 0 ? (int) (((float) this.renderHeight / (float) (MAX_CAPACITY)) * i)
-				: 0;
 	}
 
 	@Override
@@ -197,15 +128,6 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 		this.setInventorySlotContents(i, null);
 
 		return item;
-	}
-
-	@Override
-	public FluidTankInfo[] getTankInfo(final ForgeDirection from) {
-		final FluidTankInfo[] info = new FluidTankInfo[2];
-
-		info[0] = this.blubberTank.getInfo();
-
-		return info;
 	}
 
 	@Override
@@ -233,10 +155,10 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 			final Packet132TileEntityData packet) {
 		final NBTTagCompound tag = packet.customParam1;
 
-		this.renderHeight = tag.getInteger("renderHeight");
+		this.inputHeight = tag.getInteger("inputHeight");
 
-		this.blubberTank.setFluid(new FluidStack(Fluids.blubber,
-				this.renderHeight));
+		this.inputTank
+				.setFluid(new FluidStack(Fluids.blubber, this.inputHeight));
 
 		final NBTTagList dyes = tag.getTagList("Dyes");
 
@@ -246,21 +168,10 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 
 		for (int i = 0; i < dyes.tagCount(); i++) {
 			final NBTTagCompound dye = (NBTTagCompound) dyes.tagAt(i);
-			final int index = dye.getByte("Dye");
+			final int dmg = dye.getByte("Dye");
 
-			if ((index >= 0) && (index < 16)) {
-				final ItemStack loadedStack = ItemStack
-						.loadItemStackFromNBT(dye);
-				boolean found = false;
-				for (final ItemStack stack : this.dyes) {
-					if (loadedStack.getItemDamage() == stack.getItemDamage()) {
-						found = true;
-						break;
-					}
-				}
-				if (!found) {
-					this.dyes.add(index, loadedStack);
-				}
+			if (!this.dyes.containsKey(dmg)) {
+				this.dyes.put(dmg, ItemStack.loadItemStackFromNBT(dye));
 			}
 		}
 
@@ -296,19 +207,17 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 
 		for (int i = 0; i < dyes.tagCount(); i++) {
 			final NBTTagCompound dye = (NBTTagCompound) dyes.tagAt(i);
-			final int index = dye.getByte("Dye");
+			final int dmg = dye.getByte("Dye");
 
-			if ((index >= 0) && (index < 16)) {
-				this.dyes.add(index, ItemStack.loadItemStackFromNBT(dye));
-			}
+			this.dyes.put(dmg, ItemStack.loadItemStackFromNBT(dye));
 		}
 
 		final int idBlubber = compound.getInteger("itemIDBlubber");
 		final int amountBlubber = compound.getInteger("amountBlubber");
 
-		this.blubberTank.setFluid(new FluidStack(idBlubber, amountBlubber));
+		this.inputTank.setFluid(new FluidStack(idBlubber, amountBlubber));
 
-		this.renderHeight = compound.getShort("renderHeight");
+		this.inputHeight = compound.getInteger("inputHeight");
 		this.hasBottleFluid = compound.getBoolean("hasBottleFluid");
 	}
 
@@ -376,12 +285,12 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 
 		final NBTTagList dyes = new NBTTagList();
 
-		for (int i = 0; i < this.dyes.size(); i++) {
-			final ItemStack stack = this.dyes.get(i);
+		for (final int dmg : this.dyes.keySet()) {
+			final ItemStack stack = this.dyes.get(dmg);
 
 			if (stack != null) {
 				final NBTTagCompound dye = new NBTTagCompound();
-				dye.setByte("Dye", (byte) i);
+				dye.setByte("Dye", (byte) dmg);
 				stack.writeToNBT(dye);
 				dyes.appendTag(dye);
 			}
@@ -389,13 +298,13 @@ public class TileEntityMixer extends TileEntity implements IFluidHandler,
 
 		compound.setTag("Dyes", dyes);
 
-		final FluidStack liquid = this.blubberTank.getFluid();
+		final FluidStack liquid = this.inputTank.getFluid();
 		if (liquid != null) {
 			compound.setInteger("itemIDBlubber", liquid.fluidID);
 			compound.setInteger("amountBlubber", liquid.amount);
 		}
 
-		compound.setShort("renderHeight", (short) this.renderHeight);
+		compound.setInteger("inputHeight", this.inputHeight);
 		compound.setBoolean("hasBottleFluid", this.hasBottleFluid);
 	}
 }

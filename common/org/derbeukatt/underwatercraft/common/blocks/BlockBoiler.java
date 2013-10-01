@@ -8,10 +8,10 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
@@ -25,17 +25,15 @@ import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
 import org.derbeukatt.underwatercraft.UnderWaterCraft;
-import org.derbeukatt.underwatercraft.client.fx.Particles;
 import org.derbeukatt.underwatercraft.client.gui.UnderWaterCraftTab;
 import org.derbeukatt.underwatercraft.common.tileentity.TileEntityBoiler;
+import org.derbeukatt.underwatercraft.util.CoordHelper;
 
 import cpw.mods.fml.common.network.FMLNetworkHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockBoiler extends BlockContainer {
-
-	private static final int NR_OF_PARTICLES = 2;
 
 	public static ItemStack consumeItem(final ItemStack stack) {
 		if (stack.stackSize == 1) {
@@ -52,15 +50,12 @@ public class BlockBoiler extends BlockContainer {
 	}
 
 	@SideOnly(Side.CLIENT)
-	private Icon botIcon;
+	private Icon frontIcon;
+
+	@SideOnly(Side.CLIENT)
+	private Icon frontIconLit;
 	@SideOnly(Side.CLIENT)
 	public Icon particleIcon;
-
-	@SideOnly(Side.CLIENT)
-	private Icon sideIcon;
-
-	@SideOnly(Side.CLIENT)
-	private Icon topIcon;
 
 	protected BlockBoiler(final int id) {
 		super(id, Material.iron);
@@ -86,8 +81,10 @@ public class BlockBoiler extends BlockContainer {
 			final int z, final int id, final int meta) {
 		final TileEntity te = world.getBlockTileEntity(x, y, z);
 
-		if ((te != null) && (te instanceof IInventory)) {
-			final IInventory inventory = (IInventory) te;
+		if ((te != null) && (te instanceof TileEntityBoiler)) {
+			final TileEntityBoiler inventory = (TileEntityBoiler) te;
+
+			inventory.destroyMultiBlock();
 
 			for (int i = 0; i < inventory.getSizeInventory(); i++) {
 				final ItemStack stack = inventory.getStackInSlotOnClosing(i);
@@ -123,13 +120,24 @@ public class BlockBoiler extends BlockContainer {
 
 	@Override
 	public Icon getIcon(final int side, final int meta) {
-		if (side == 0) {
-			return this.botIcon;
-		} else if (side == 1) {
-			return this.topIcon;
+
+		final boolean isActive = ((meta >> 2) == 1);
+		final int facing = (meta & CoordHelper.META_MASK_DIR);
+
+		if (side == CoordHelper.getSideForBlockFace(facing)) {
+			if (isActive) {
+				return this.frontIconLit;
+			}
+			return this.frontIcon;
 		} else {
-			return this.sideIcon;
+			return this.blockIcon;
 		}
+	}
+
+	@Override
+	public int getLightValue(final IBlockAccess world, final int x,
+			final int y, final int z) {
+		return ((world.getBlockMetadata(x, y, z) >> 2) == 0 ? 0 : 15);
 	}
 
 	@Override
@@ -151,64 +159,81 @@ public class BlockBoiler extends BlockContainer {
 
 			final TileEntityBoiler te = (TileEntityBoiler) world
 					.getBlockTileEntity(x, y, z);
+			if (!te.isValidMultiBlock) {
+				if (te.checkIfMultiBlock()) {
+					te.makeMultiBlock();
+				}
+			} else {
+				final ItemStack heldItem = player.inventory.getCurrentItem();
+				if (heldItem != null) {
+					final FluidStack fluid = FluidContainerRegistry
+							.getFluidForFilledItem(player
+									.getCurrentEquippedItem());
 
-			final ItemStack heldItem = player.inventory.getCurrentItem();
-			if (heldItem != null) {
-				final FluidStack fluid = FluidContainerRegistry
-						.getFluidForFilledItem(player.getCurrentEquippedItem());
+					if (fluid != null) {
 
-				if (fluid != null) {
-
-					if (!player.capabilities.isCreativeMode) {
-						player.inventory.setInventorySlotContents(
-								player.inventory.currentItem,
-								consumeItem(heldItem));
-
-					}
-					te.fill(ForgeDirection.getOrientation(side), fluid, true);
-				} else if (FluidContainerRegistry.isContainer(heldItem)) {
-					FluidStack fillFluid = null;
-					if (te.getBlubberTank().getFluidAmount() >= FluidContainerRegistry.BUCKET_VOLUME) {
-						fillFluid = te.getBlubberTank().getFluid();
-					} else {
-						fillFluid = te.getWaterTank().getFluid();
-					}
-					final ItemStack fillStack = FluidContainerRegistry
-							.fillFluidContainer(fillFluid, heldItem);
-					if (fillStack != null) {
-						te.drain(ForgeDirection.UNKNOWN, FluidContainerRegistry
-								.getFluidForFilledItem(fillStack), true);
 						if (!player.capabilities.isCreativeMode) {
-							if (heldItem.stackSize == 1) {
-								player.inventory
-										.setInventorySlotContents(
-												player.inventory.currentItem,
-												fillStack);
-							} else {
-								player.inventory.setInventorySlotContents(
-										player.inventory.currentItem,
-										consumeItem(heldItem));
+							player.inventory.setInventorySlotContents(
+									player.inventory.currentItem,
+									consumeItem(heldItem));
 
-								if (!player.inventory
-										.addItemStackToInventory(fillStack)) {
-									player.dropPlayerItem(fillStack);
+						}
+						te.fill(ForgeDirection.getOrientation(side), fluid,
+								true);
+					} else if (FluidContainerRegistry.isContainer(heldItem)) {
+						FluidStack fillFluid = null;
+						if (te.getOutputTank().getFluidAmount() >= FluidContainerRegistry.BUCKET_VOLUME) {
+							fillFluid = te.getOutputTank().getFluid();
+						} else {
+							fillFluid = te.getInputTank().getFluid();
+						}
+						final ItemStack fillStack = FluidContainerRegistry
+								.fillFluidContainer(fillFluid, heldItem);
+						if (fillStack != null) {
+							te.drain(ForgeDirection.UNKNOWN,
+									FluidContainerRegistry
+											.getFluidForFilledItem(fillStack),
+									true);
+							if (!player.capabilities.isCreativeMode) {
+								if (heldItem.stackSize == 1) {
+									player.inventory.setInventorySlotContents(
+											player.inventory.currentItem,
+											fillStack);
+								} else {
+									player.inventory.setInventorySlotContents(
+											player.inventory.currentItem,
+											consumeItem(heldItem));
+
+									if (!player.inventory
+											.addItemStackToInventory(fillStack)) {
+										player.dropPlayerItem(fillStack);
+									}
 								}
 							}
 						}
+					} else {
+						FMLNetworkHandler.openGui(player,
+								UnderWaterCraft.instance, 0, world, x, y, z);
 					}
+
 				} else {
 					FMLNetworkHandler.openGui(player, UnderWaterCraft.instance,
 							0, world, x, y, z);
 				}
-				return true;
-			} else {
-				FMLNetworkHandler.openGui(player, UnderWaterCraft.instance, 0,
-						world, x, y, z);
-				return true;
 			}
+			return true;
 		} else {
 			return true;
 		}
+	}
+
+	@Override
+	public void onBlockPlacedBy(final World world, final int x, final int y,
+			final int z, final EntityLivingBase entity,
+			final ItemStack itemStack) {
+		final int metadata = CoordHelper.getBlockFacing(entity);
+
+		world.setBlockMetadataWithNotify(x, y, z, metadata, 2);
 	}
 
 	@Override
@@ -226,70 +251,52 @@ public class BlockBoiler extends BlockContainer {
 	@SideOnly(Side.CLIENT)
 	public void randomDisplayTick(final World world, final int x, final int y,
 			final int z, final Random rand) {
-
-		final TileEntity blockTileEntity = world.getBlockTileEntity(x, y, z);
-
-		if (blockTileEntity instanceof TileEntityBoiler) {
-			final TileEntityBoiler tileBoiler = (TileEntityBoiler) blockTileEntity;
-
-			if (tileBoiler != null) {
-				if (tileBoiler.isBoiling()) {
-
-					float fillStand = 0.0F;
-					float particleX = 0.0F;
-					float particleY = 0.0F;
-					float particleZ = 0.0F;
-
-					if (tileBoiler.renderHeight > 0) {
-
-						fillStand = 0.00003125F * tileBoiler.renderHeight;
-
-						particleX = x
-								+ ((rand.nextFloat() * (0.4375F - 0.0625F)) + 0.0625F);
-						particleY = y
-								+ ((rand.nextFloat() * ((0.425F + fillStand) - (0.4F + fillStand))) + (0.4F + fillStand));
-						particleZ = z
-								+ ((rand.nextFloat() * (0.9375F - 0.0625F)) + 0.0625F);
-
-						for (int i = 0; i < NR_OF_PARTICLES; i++) {
-							Particles.BOILERWATERBUBBLES.spawnParticle(world,
-									particleX, particleY, particleZ, 0.0D,
-									0.0D, 0.0D);
-						}
-					}
-
-					if (tileBoiler.blubberAmount > 0) {
-
-						fillStand = 0.00003125F * tileBoiler.blubberAmount;
-
-						particleX = x
-								+ ((rand.nextFloat() * (0.9375F - 0.5625F)) + 0.5625F);
-						particleY = y
-								+ ((rand.nextFloat() * ((0.425F + fillStand) - (0.4F + fillStand))) + (0.4F + fillStand));
-						particleZ = z
-								+ ((rand.nextFloat() * (0.9375F - 0.0625F)) + 0.0625F);
-
-						for (int i = 0; i < NR_OF_PARTICLES; i++) {
-							Particles.BOILERBLUBBERBUBBLES.spawnParticle(world,
-									particleX, particleY, particleZ, 0.0D,
-									0.0D, 0.0D);
-						}
-					}
-				}
-			}
+		final int metadata = world.getBlockMetadata(x, y, z);
+		if ((metadata & CoordHelper.META_ISACTIVE) == 0) {
+			return;
 		}
+
+		final int facing = metadata & CoordHelper.META_MASK_DIR;
+
+		final double yMod = (0.3 * rand.nextDouble());
+		double xMod = -0.02;
+		double zMod = (0.75 - (0.5 * rand.nextDouble()));
+		double temp = 0.0;
+
+		switch (facing) {
+		case CoordHelper.META_DIR_EAST:
+			xMod += 1.04;
+			break;
+
+		case CoordHelper.META_DIR_NORTH:
+			temp = xMod;
+			xMod = zMod;
+			zMod = temp;
+			break;
+
+		case CoordHelper.META_DIR_SOUTH:
+			temp = xMod;
+			xMod = zMod;
+			zMod = temp + 1.04;
+			break;
+
+		default:
+			break;
+		}
+
+		world.spawnParticle("smoke", x + xMod, y + yMod, z + zMod, 0, 0, 0);
+		world.spawnParticle("flame", x + xMod, y + yMod, z + zMod, 0, 0, 0);
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerIcons(final IconRegister register) {
-		this.topIcon = register.registerIcon(new ResourceLocation(
-				BlockInfo.TEXTURE_LOCATION, BlockInfo.BOILER_TOP).toString());
-		this.botIcon = register
-				.registerIcon(new ResourceLocation(BlockInfo.TEXTURE_LOCATION,
-						BlockInfo.BOILER_BOTTOM).toString());
-		this.sideIcon = register.registerIcon(new ResourceLocation(
-				BlockInfo.TEXTURE_LOCATION, BlockInfo.BOILER_SIDE).toString());
+		this.blockIcon = Block.brick.getIcon(0, 0);
+		this.frontIconLit = register.registerIcon(new ResourceLocation(
+				BlockInfo.TEXTURE_LOCATION, BlockInfo.BOILER_FRONT_LIT)
+				.toString());
+		this.frontIcon = register.registerIcon(new ResourceLocation(
+				BlockInfo.TEXTURE_LOCATION, BlockInfo.BOILER_FRONT).toString());
 		this.particleIcon = register.registerIcon(new ResourceLocation(
 				BlockInfo.TEXTURE_LOCATION, BlockInfo.BOILER_PARTICLE)
 				.toString());

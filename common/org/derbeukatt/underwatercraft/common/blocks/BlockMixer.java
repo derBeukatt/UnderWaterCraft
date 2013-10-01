@@ -105,7 +105,7 @@ public class BlockMixer extends BlockContainer {
 				}
 			}
 
-			for (final ItemStack stack : inventory.dyes) {
+			for (final ItemStack stack : inventory.dyes.values()) {
 				if (stack != null) {
 					final float spawnX = x + world.rand.nextFloat();
 					final float spawnY = y + world.rand.nextFloat();
@@ -181,7 +181,7 @@ public class BlockMixer extends BlockContainer {
 					}
 					te.fill(ForgeDirection.getOrientation(side), fluid, true);
 				} else if (FluidContainerRegistry.isContainer(heldItem)) {
-					final FluidStack fillFluid = te.getBlubberTank().getFluid();
+					final FluidStack fillFluid = te.getInputTank().getFluid();
 					final ItemStack fillStack = FluidContainerRegistry
 							.fillFluidContainer(fillFluid, heldItem);
 					if (fillStack != null) {

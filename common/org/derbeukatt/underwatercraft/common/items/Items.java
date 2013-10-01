@@ -54,9 +54,6 @@ public class Items {
 	}
 
 	public static void init() {
-		LanguageRegistry.instance().addStringLocalization(
-				"itemGroup.tabUnderWaterCraft", "UnderWaterCraft");
-
 		itemScale = new ItemScale(ItemInfo.SCALE_ID);
 		itemScaleHard = new ItemScaleHard(ItemInfo.HARD_SCALE_ID);
 		itemScalePlate = new ItemScalePlate(ItemInfo.SCALE_PLATE_ID);

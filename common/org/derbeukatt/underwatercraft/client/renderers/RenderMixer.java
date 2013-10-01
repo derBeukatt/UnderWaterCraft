@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.IBlockAccess;
 
 import org.derbeukatt.underwatercraft.common.fluids.Fluids;
-import org.derbeukatt.underwatercraft.common.tileentity.TileEntityMixer;
+import org.derbeukatt.underwatercraft.common.tileentity.TileEntityWithTanks;
 import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
@@ -95,8 +95,8 @@ public class RenderMixer implements ISimpleBlockRenderingHandler {
 			final int y, final int z, final Block block, final int modelId,
 			final RenderBlocks renderer) {
 
-		final TileEntityMixer te = (TileEntityMixer) world.getBlockTileEntity(
-				x, y, z);
+		final TileEntityWithTanks te = (TileEntityWithTanks) world
+				.getBlockTileEntity(x, y, z);
 
 		Tessellator.instance.setColorOpaque_F(1F, 1F, 1F);
 
@@ -124,10 +124,10 @@ public class RenderMixer implements ISimpleBlockRenderingHandler {
 		renderer.setRenderBounds(0F, 0.4F, 0.9375F, 1F, 1F, 1F);
 		renderer.renderStandardBlock(block, x, y, z);
 
-		if (te.renderHeight > 0) {
+		if (te.getInputHeight() > 0) {
 			/* render blubber tank */
 			renderer.setRenderBounds(0.0625F, 0.4F, 0.0625F, 0.9375F,
-					0.4F + (te.renderHeight * 0.00003125F), 0.9375F);
+					0.4F + (te.getInputHeight() * 0.00003125F), 0.9375F);
 			renderer.renderFaceYPos(block, x, y, z, Fluids.blubber.getIcon());
 		}
 

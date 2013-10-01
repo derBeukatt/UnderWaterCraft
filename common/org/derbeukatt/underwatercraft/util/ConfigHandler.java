@@ -52,6 +52,9 @@ public class ConfigHandler {
 
 		BlockInfo.BOILER_ID = configuration.getBlock(BlockInfo.BOILER_KEY,
 				BlockInfo.BOILER_DEFAULT).getInt();
+		BlockInfo.BOILER_WALL_ID = configuration.getBlock(
+				BlockInfo.BOILER_WALL_KEY, BlockInfo.BOILER_WALL_DEFAULT)
+				.getInt();
 		BlockInfo.MIXER_ID = configuration.getBlock(BlockInfo.MIXER_KEY,
 				BlockInfo.MIXER_DEFAULT).getInt();
 		BlockInfo.BLUBBER_ID = configuration.getBlock(BlockInfo.BLUBBER_KEY,

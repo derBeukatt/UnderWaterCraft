@@ -26,13 +26,15 @@ public class ItemScaleArmor extends ItemArmor implements ISpecialArmor {
 	public void damageArmor(final EntityLivingBase entity,
 			final ItemStack stack, final DamageSource source, final int damage,
 			final int slot) {
-		int divider = 1;
+		if (!source.equals(DamageSource.drown)) {
+			int divider = 1;
 
-		if (entity.isInWater()) {
-			divider = 2;
+			if (entity.isInWater()) {
+				divider = 2;
+			}
+
+			stack.damageItem(damage / divider, entity);
 		}
-
-		stack.damageItem(damage / divider, entity);
 	}
 
 	@Override
