@@ -29,8 +29,9 @@ public class Entities {
 				redColor, orangeColor);
 		System.out.println("AHHHH OCTOPUS");
 		EntityRegistry.addSpawn(EntityOctopus.class, 8, 2, 5,
-				EnumCreatureType.monster, BiomeGenBase.ocean,
+				EnumCreatureType.waterCreature, BiomeGenBase.ocean,
 				BiomeGenBase.swampland, BiomeGenBase.plains);
+
 		LanguageRegistry.instance().addStringLocalization(
 				"entity.UnderWaterCraft.EntityOctopus.name", "Entity Octopus");
 

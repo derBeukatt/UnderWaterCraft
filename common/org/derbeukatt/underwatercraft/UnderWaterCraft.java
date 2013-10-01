@@ -16,7 +16,7 @@ import org.derbeukatt.underwatercraft.network.PacketHandler;
 import org.derbeukatt.underwatercraft.util.BucketHandler;
 import org.derbeukatt.underwatercraft.util.ClientTickHandler;
 import org.derbeukatt.underwatercraft.util.ConfigHandler;
-import org.derbeukatt.underwatercraft.util.TextureHandler;
+//import org.derbeukatt.underwatercraft.util.TextureHandler;
 
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
@@ -82,7 +82,7 @@ public class UnderWaterCraft {
 				Items.itemRainbowBlubberBucket);
 
 		MinecraftForge.EVENT_BUS.register(BucketHandler.INSTANCE);
-		MinecraftForge.EVENT_BUS.register(new TextureHandler());
+		// MinecraftForge.EVENT_BUS.register(new TextureHandler());
 
 		TickRegistry.registerTickHandler(new ClientTickHandler(), Side.CLIENT);
 	}
