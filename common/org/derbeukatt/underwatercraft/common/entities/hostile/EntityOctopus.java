@@ -1,11 +1,11 @@
 package org.derbeukatt.underwatercraft.common.entities.hostile;
 
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.EntityAIAttackOnCollide;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAIMoveTowardsRestriction;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
-import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.monster.EntityMob;
@@ -48,18 +48,20 @@ public class EntityOctopus extends EntityMob {
 		// this.navigator = new PathNavigate(this, world);
 		// this.navigator = new UnderWaterNavigate(this, world);
 		// this.getNavigator().setBreakDoors(true);
-		// this.getNavigator().setAvoidsWater(true);
-		// this.getNavigator().setCanSwim(false);
+		// this.getNavigator().setAvoidsWater(false);
+		// this.getNavigator().setCanSwim(true);
 		// this.getNavigator().setSpeed(0.25f);
 		// this.getNavigator().setAvoidSun(false);
 
-		this.tasks.addTask(0, new EntityAISwimming(this));
+		// t
 
 		this.tasks.addTask(1, new EntityAIMoveTowardsRestriction(this, 1.0D));
-		this.tasks.addTask(4, new EntityAIAttackOnCollide(this,
+		// this.tasks.addTask(2, new EntityOctopusSwimming(this));
+		this.tasks.addTask(3, new EntityAIAttackOnCollide(this,
 				EntityPlayer.class, 1.0D, false));
-		this.tasks.addTask(2, new EntityAIWander(this, 1.0D));
-		this.tasks.addTask(3, new EntityAIWatchClosest(this,
+
+		this.tasks.addTask(4, new EntityAIWander(this, 1.0D));
+		this.tasks.addTask(5, new EntityAIWatchClosest(this,
 				EntityPlayer.class, 8.0F));
 
 		this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, true));
@@ -87,6 +89,21 @@ public class EntityOctopus extends EntityMob {
 	protected Entity findPlayerToAttack() {
 		final double d0 = 16.0D;
 		return this.worldObj.getClosestVulnerablePlayerToEntity(this, d0);
+
+	}
+
+	/**
+	 * Takes a coordinate in and returns a weight to determine how likely this
+	 * creature will try to path to the block. Args: x, y, z
+	 */
+	@Override
+	public float getBlockPathWeight(final int par1, final int par2,
+			final int par3) {
+		if (this.worldObj.getBlockMaterial(par1, par2, par3) == Material.water) {
+			return 1.0F;
+		} else {
+			return 0.5F - this.worldObj.getLightBrightness(par1, par2, par3);
+		}
 
 	}
 
