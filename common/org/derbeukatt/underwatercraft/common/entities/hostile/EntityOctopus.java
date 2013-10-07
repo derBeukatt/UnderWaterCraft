@@ -25,7 +25,7 @@ public class EntityOctopus extends EntityMob {
 	// public float field_70868_i;
 	// private float field_70871_bB;
 
-	// private final PathNavigate navigator;
+	// private UnderWaterNavigate navigator;
 
 	public float prevSquidPitch;
 	public float prevSquidYaw;
@@ -48,7 +48,7 @@ public class EntityOctopus extends EntityMob {
 		// this.navigator = new PathNavigate(this, world);
 		// this.navigator = new UnderWaterNavigate(this, world);
 		// this.getNavigator().setBreakDoors(true);
-		// this.getNavigator().setAvoidsWater(false);
+		// this.getNavigator().setAvoidsWater(true);
 		// this.getNavigator().setCanSwim(true);
 		// this.getNavigator().setSpeed(0.25f);
 		// this.getNavigator().setAvoidSun(false);
